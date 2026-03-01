@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0">
+  <title>Finom – Transactions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #d8dde0;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .screen {
+      width: 375px;
+      background: #eef1f2;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ── Status bar ───────────────────────────────────────────── */
+    .status-bar {
+      background: #eef1f2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px 12px 20px;
+      height: 44px;
+    }
+    .status-time {
+      font-family: -apple-system, 'SF Pro Text', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #242424;
+      letter-spacing: -0.165px;
+    }
+    .status-icons { display: flex; align-items: center; gap: 7px; }
+
+    /* ── Page header ──────────────────────────────────────────── */
+    .page-header {
+      padding: 8px 16px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #242424;
+      line-height: 34px;
+    }
+
+    /* ── Filter bar ───────────────────────────────────────────── */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      padding: 0 16px 12px;
+      overflow-x: auto;
+    }
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #242424;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: 'Poppins', sans-serif;
+    }
+    .filter-chip.active {
+      background: #242424;
+      color: #fff;
+    }
+
+    /* ── Search bar ───────────────────────────────────────────── */
+    .search-bar {
+      margin: 0 16px 12px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .search-bar input {
+      border: none;
+      outline: none;
+      font-size: 15px;
+      font-family: 'Poppins', sans-serif;
+      color: #242424;
+      flex: 1;
+      background: transparent;
+    }
+    .search-bar input::placeholder { color: rgba(36,47,51,0.4); }
+
+    /* ── Content ──────────────────────────────────────────────── */
+    .content {
+      padding: 0 16px 110px;
+    }
+
+    /* ── Date group ───────────────────────────────────────────── */
+    .date-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(36,47,51,0.64);
+      padding: 8px 0;
+    }
+
+    /* ── Transaction card ─────────────────────────────────────── */
+    .tx-card {
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .tx-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+    }
+    .tx-row + .tx-row {
+      border-top: 1px solid rgba(36,47,51,0.06);
+    }
+    .tx-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .tx-info { flex: 1; min-width: 0; }
+    .tx-name {
+      font-size: 15px;
+      font-weight: 500;
+      color: #242424;
+      line-height: 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tx-category {
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(36,47,51,0.64);
+      line-height: 18px;
+    }
+    .tx-amount {
+      font-size: 15px;
+      font-weight: 500;
+      color: #242424;
+      white-space: nowrap;
+      text-align: right;
+    }
+    .tx-amount.negative { color: #242424; }
+    .tx-amount.positive { color: #2fa84f; }
+    .tx-status {
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(36,47,51,0.45);
+      text-align: right;
+      line-height: 14px;
+    }
+    .tx-right { text-align: right; }
+
+    /* ── Bottom navigation ────────────────────────────────────── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 375px;
+      height: 86px;
+      background: linear-gradient(to bottom, rgba(238,241,242,0) 0%, #eef1f2 55%);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 0;
+      pointer-events: none;
+    }
+    .tab-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      pointer-events: all;
+    }
+    .tab-bar {
+      background: rgba(36, 36, 36, 0.94);
+      border-radius: 40px;
+      height: 58px;
+      display: flex;
+      width: 274px;
+    }
+    .tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 7px 0 2px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .tab-icon { width: 24px; height: 24px; opacity: 0.6; }
+    .tab-icon svg { width: 100%; height: 100%; }
+    .tab.active .tab-icon { opacity: 1; }
+    .tab-label {
+      font-size: 10px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.6);
+      line-height: 10px;
+    }
+    .tab.active .tab-label { color: #fff; }
+    .ai-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(150deg, rgba(169,142,242,0.3) 12%, rgba(254,66,180,0.3) 78%);
+      border: 1px solid rgba(0,0,0,0.1);
+      box-shadow: 0 9px 16px rgba(0,0,0,0.09);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="screen">
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0" y="7" width="3" height="4" rx="0.5" fill="#242424"/>
+        <rect x="4.5" y="5" width="3" height="6" rx="0.5" fill="#242424"/>
+        <rect x="9" y="2.5" width="3" height="8.5" rx="0.5" fill="#242424"/>
+        <rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="#242424"/>
+      </svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <circle cx="8" cy="10.5" r="1.3" fill="#242424"/>
+        <path d="M4.5 7.5C5.6 6.2 6.7 5.6 8 5.6s2.4.6 3.5 1.9" stroke="#242424" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+        <path d="M1.5 4.5C3.2 2.4 5.5 1.2 8 1.2s4.8 1.2 6.5 3.3" stroke="#242424" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="26" height="13" viewBox="0 0 26 13" fill="none">
+        <rect x="0.5" y="0.5" width="21" height="12" rx="3.5" stroke="#242424" stroke-opacity="0.35"/>
+        <rect x="2" y="2" width="17" height="9" rx="2" fill="#242424"/>
+        <path d="M23 4.5v4a2 2 0 000-4z" fill="#242424" fill-opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1 class="page-title">Transactions</h1>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M4 6h16M4 12h16M4 18h16" stroke="#242424" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <button class="filter-chip active">All</button>
+    <button class="filter-chip">Income</button>
+    <button class="filter-chip">Expenses</button>
+    <button class="filter-chip">Pending</button>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-bar">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <circle cx="8" cy="8" r="6.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.3" fill="none"/>
+      <path d="M13 13l3.5 3.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+    <input type="text" placeholder="Search transactions">
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- Today -->
+    <div class="date-label">Today</div>
+    <div class="tx-card">
+      <div class="tx-row">
+        <div class="tx-avatar" style="background:#ff6fa3;">S</div>
+        <div class="tx-info">
+          <div class="tx-name">Spotify AB</div>
+          <div class="tx-category">Subscriptions</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount negative">– 14,99 €</div>
+          <div class="tx-status">Completed</div>
+        </div>
+      </div>
+      <div class="tx-row">
+        <div class="tx-avatar" style="background:#4a90d9;">A</div>
+        <div class="tx-info">
+          <div class="tx-name">AWS Services</div>
+          <div class="tx-category">Software</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount negative">– 248,00 €</div>
+          <div class="tx-status">Completed</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Yesterday -->
+    <div class="date-label">Yesterday</div>
+    <div class="tx-card">
+      <div class="tx-row">
+        <div class="tx-avatar" style="background:#2fa84f;">M</div>
+        <div class="tx-info">
+          <div class="tx-name">Martin Schmidt</div>
+          <div class="tx-category">Invoice #1042</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount positive">+ 3 200,00 €</div>
+          <div class="tx-status">Completed</div>
+        </div>
+      </div>
+      <div class="tx-row">
+        <div class="tx-avatar" style="background:#f5a623;">W</div>
+        <div class="tx-info">
+          <div class="tx-name">WeWork</div>
+          <div class="tx-category">Office rent</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount negative">– 890,00 €</div>
+          <div class="tx-status">Completed</div>
+        </div>
+      </div>
+      <div class="tx-row">
+        <div class="tx-avatar" style="background:#9b59b6;">F</div>
+        <div class="tx-info">
+          <div class="tx-name">Figma Inc.</div>
+          <div class="tx-category">Software</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount negative">– 45,00 €</div>
+          <div class="tx-status">Completed</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feb 27 -->
+    <div class="date-label">Feb 27</div>
+    <div class="tx-card">
+      <div class="tx-row">
+        <div class="tx-avatar" style="background:#e74c3c;">T</div>
+        <div class="tx-info">
+          <div class="tx-name">Tax payment</div>
+          <div class="tx-category">Taxes &amp; fees</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount negative">– 1 450,00 €</div>
+          <div class="tx-status">Completed</div>
+        </div>
+      </div>
+      <div class="tx-row">
+        <div class="tx-avatar" style="background:#3498db;">L</div>
+        <div class="tx-info">
+          <div class="tx-name">Luisa Meyer GmbH</div>
+          <div class="tx-category">Invoice #1041</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount positive">+ 1 750,00 €</div>
+          <div class="tx-status">Completed</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feb 25 -->
+    <div class="date-label">Feb 25</div>
+    <div class="tx-card">
+      <div class="tx-row">
+        <div class="tx-avatar" style="background:#1abc9c;">G</div>
+        <div class="tx-info">
+          <div class="tx-name">Google Ads</div>
+          <div class="tx-category">Marketing</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount negative">– 320,46 €</div>
+          <div class="tx-status">Completed</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAVIGATION -->
+  <div class="bottom-nav">
+    <div class="tab-bar-wrap">
+      <div class="tab-bar">
+        <a href="dashboard.html" class="tab">
+          <div class="tab-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M3 11L12 3l9 8v9a1 1 0 01-1 1H5a1 1 0 01-1-1V11z" fill="white" fill-opacity="0.6"/>
+              <path d="M9 21v-8h6v8" stroke="rgba(36,36,36,0.5)" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="tab-label">Home</span>
+        </a>
+        <a href="transactions.html" class="tab active">
+          <div class="tab-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 4v16M7 4L4 7M7 4l3 3M17 20V4M17 20l-3-3M17 20l3-3"
+                stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="tab-label">Transactions</span>
+        </a>
+        <a href="get-paid.html" class="tab">
+          <div class="tab-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="6" width="18" height="13" rx="2.5" stroke="white" stroke-width="1.5" fill="none"/>
+              <path d="M3 10.5h18" stroke="white" stroke-width="1.5"/>
+              <circle cx="7.5" cy="14.5" r="1" fill="white"/>
+            </svg>
+          </div>
+          <span class="tab-label">Get paid</span>
+        </a>
+        <a href="more.html" class="tab">
+          <div class="tab-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="5" cy="12" r="1.5" fill="white"/>
+              <circle cx="12" cy="12" r="1.5" fill="white"/>
+              <circle cx="19" cy="12" r="1.5" fill="white"/>
+            </svg>
+          </div>
+          <span class="tab-label">More</span>
+        </a>
+      </div>
+      <button class="ai-btn">
+        <img src="https://www.figma.com/api/mcp/asset/827b64a1-f7d3-470b-ae4e-bb74ea4e36b9" alt="AI assistant" width="26" height="29">
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/app-context.js"></script>
+<script>
+(function () {
+  var ctx = { currentScreen: 'transactions' };
+
+  var txs = [];
+  var currentDate = '';
+  document.querySelectorAll('.date-label, .tx-row').forEach(function (el) {
+    if (el.classList.contains('date-label')) {
+      currentDate = el.textContent.trim();
+    } else {
+      var name = (el.querySelector('.tx-name') || {}).textContent || '';
+      var cat = (el.querySelector('.tx-category') || {}).textContent || '';
+      var amount = (el.querySelector('.tx-amount') || {}).textContent || '';
+      var status = (el.querySelector('.tx-status') || {}).textContent || '';
+      txs.push({ name: name, category: cat, amount: amount.trim(), date: currentDate, status: status });
+    }
+  });
+  ctx.transactions = txs;
+
+  var activeChip = document.querySelector('.filter-chip.active');
+  var searchInput = document.querySelector('.search-bar input');
+  ctx.transactionFilters = {
+    activeFilter: activeChip ? activeChip.textContent.trim() : 'All',
+    searchQuery: searchInput ? searchInput.value : ''
+  };
+
+  FinomAI.AppContext.update(ctx);
+
+  document.querySelector('.ai-btn').addEventListener('click', function () {
+    window.location.href = 'ai.html';
+  });
+})();
+</script>
+</body>
+</html>
