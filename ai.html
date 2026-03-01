@@ -508,20 +508,20 @@
     <span class="chat-title">Assistant</span>
     <div class="chat-menu-icons">
       <!-- History / clock -->
-      <div class="chat-menu-icon">
+      <div class="chat-menu-icon" id="history-btn">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <circle cx="12" cy="12" r="8.25" stroke="#242424" stroke-width="1.25"/>
           <path d="M12 8.5v3.75l2.25 2.25" stroke="#242424" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <!-- Edit / pencil -->
-      <div class="chat-menu-icon">
+      <!-- Edit / pencil — starts new chat -->
+      <div class="chat-menu-icon" id="new-chat-btn">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke="#242424" stroke-width="1.25" stroke-linejoin="round"/>
         </svg>
       </div>
       <!-- More / ellipsis -->
-      <div class="chat-menu-icon">
+      <div class="chat-menu-icon" id="more-btn">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <circle cx="5.5" cy="12" r="1.5" fill="#242424"/>
           <circle cx="12" cy="12" r="1.5" fill="#242424"/>
@@ -539,11 +539,7 @@
 
       <!-- Greeting row -->
       <div class="welcome-row">
-        <div class="ai-icon">
-          <svg width="16" height="18" viewBox="0 0 16 18" fill="none">
-            <path d="M8 1.5l1.7 5H15l-4.2 3 1.6 5-4.4-2.8L3.6 14.5l1.6-5L1 6.5h5.3L8 1.5z" fill="rgba(169,142,242,0.65)" stroke="rgba(169,142,242,0.85)" stroke-width="0.5" stroke-linejoin="round"/>
-          </svg>
-        </div>
+        <img class="ai-icon" src="https://www.figma.com/api/mcp/asset/6f43660a-98ba-4af8-8f41-0407f8de1122" alt="" style="object-fit:cover;">
         <p class="welcome-greeting-text" id="welcome-greeting">Hello! Tell me what you want to achieve today</p>
       </div>
 
@@ -563,7 +559,7 @@
         <div class="prompt-cards-scroll">
           <button class="suggestion-chip prompt-card prompt-card--wide prompt-card--gradient-220" data-query="Plan my 2026 budget by analyzing my expenses and making forecasts">Plan my 2026 budget by analyzing my expenses and making forecasts</button>
           <button class="suggestion-chip prompt-card prompt-card--medium prompt-card--gradient-232" data-query="Where am I spending inefficiently?">Where am I spending inefficiently?</button>
-          <button class="suggestion-chip prompt-card prompt-card--medium" data-query="How can I save money on cards?">How can I save money on cards?</button>
+          <button class="suggestion-chip prompt-card prompt-card--medium prompt-card--gradient-232" data-query="How can I save money on cards?">How can I save money on cards?</button>
         </div>
       </div>
 

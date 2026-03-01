@@ -30,6 +30,30 @@ window.FinomAI.ChatEngine = (function () {
     return new Promise(function (resolve) { setTimeout(resolve, ms); });
   }
 
+  /* ── Mock answers for known prompts ────────────────────────── */
+
+  var mockAnswers = {
+    'how can i get a loan on favorable terms?':
+      'To get better loan terms, focus on three levers:\n• predictable cash flow\n• clean financials and tax status\n• competing offers from multiple providers\n\nFor a quick start: prepare last 6–12 months of revenue, main expense categories, existing liabilities, and any collateral. Then compare APR, fees, early repayment rules, and guarantees.\n\nIf you tell me your monthly revenue range and legal form (sole trader / LTD), I\'ll suggest what lenders typically prioritize and what to improve first.',
+
+    'how can i earn income from my savings?':
+      'It depends on your horizon and risk comfort.\n\nLow risk:\n• high-yield savings / deposits\n• money market funds (where available)\n\nMedium risk:\n• bond ETFs or a diversified conservative portfolio\n\nRule of thumb: keep an emergency fund (3–6 months), and don\'t lock all cash long-term.\n\nTell me the currency, time horizon, and whether you can tolerate price swings, and I\'ll propose a simple allocation + what metrics to track.',
+
+    'how can i accept payments via qr?':
+      'There are two common QR approaches:\n• static QR (customer enters amount)\n• dynamic QR (amount + order details included)\n\nFor retail checkout, dynamic QR reduces mistakes and speeds up payment confirmation.\nIn a prototype you can simulate this flow:\n1) show QR modal\n2) "confirm payment" after a delay\n3) mark order as Paid\n\nDo you want the QR to behave like bank transfer QR (IBAN/SEPA) or wallet/card QR?',
+
+    'plan my 2026 budget by analyzing my expenses and making forecasts':
+      'I can build a 2026 budget forecast like this:\n1) group 2025 spend into categories\n2) find recurring bills + seasonality\n3) estimate baseline monthly spend\n4) forecast 2026 with assumptions (inflation, planned changes, savings goal)\n\nFor the prototype, I can output:\n• average monthly spend\n• top categories\n• forecasted 2026 total\n• 2–3 recommendations to stay on track\n\nIf you have mocked transaction data (even 20–30 rows), I can shape the response around it.',
+
+    'where am i spending inefficiently?':
+      'I usually spot inefficiency in four places:\n• unused subscriptions\n• duplicated services\n• high-frequency small spends (delivery, taxis, coffee)\n• fees (banking, FX, late fees)\n\nFor a prototype, I\'d highlight 3 quick wins with estimated monthly savings and one "structural" recommendation.\n\nIf you share what mocked categories you have, I\'ll tailor the "inefficiency" findings to them.'
+  };
+
+  function findMockAnswer(text) {
+    var key = text.trim().toLowerCase().replace(/\.\s*$/, '');
+    return mockAnswers[key] || null;
+  }
+
   /* ── Send a user message and simulate AI response ──────────── */
 
   function sendUserMessage(text) {
@@ -37,6 +61,15 @@ window.FinomAI.ChatEngine = (function () {
     isSending = true;
 
     addMessage({ role: 'user', content: text });
+
+    var mock = findMockAnswer(text);
+    if (mock) {
+      return delay(700 + Math.floor(Math.random() * 500))
+        .then(function () {
+          addMessage({ role: 'assistant', content: mock });
+        })
+        .then(function () { isSending = false; });
+    }
 
     var plan = planResponse(text.toLowerCase());
 
@@ -241,11 +274,18 @@ window.FinomAI.ChatEngine = (function () {
     }
   }
 
+  function reset() {
+    messages = [];
+    isSending = false;
+    notify();
+  }
+
   return {
     sendUserMessage: sendUserMessage,
     getMessages: getMessages,
     getIsSending: getIsSending,
     onMessagesChange: onMessagesChange,
-    addMessage: addMessage
+    addMessage: addMessage,
+    reset: reset
   };
 })();

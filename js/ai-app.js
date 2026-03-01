@@ -10,6 +10,7 @@
   var chips = document.querySelectorAll('.suggestion-chip');
 
   var hasMessages = false;
+  var newChatBtn = document.getElementById('new-chat-btn');
 
   /* ── Save previous screen before overwriting ───────────────── */
   var ctx = FinomAI.AppContext.get();
@@ -19,6 +20,32 @@
   backBtn.addEventListener('click', function () {
     var map = { dashboard: 'index.html', transactions: 'transactions.html', 'get-paid': 'get-paid.html', more: 'more.html' };
     window.location.href = map[previousScreen] || 'index.html';
+  });
+
+  /* ── New chat (pencil icon) ────────────────────────────────── */
+  newChatBtn.addEventListener('click', function () {
+    // Reset chat engine state
+    FinomAI.ChatEngine.reset();
+
+    // Remove all chat messages from DOM
+    var msgEls = chatArea.querySelectorAll('.chat-msg, .chat-bubble--typing');
+    msgEls.forEach(function (el) { el.remove(); });
+
+    // Also remove typing indicator if present
+    var typing = document.getElementById('typing-indicator');
+    if (typing) typing.remove();
+
+    // Show welcome state again
+    welcomeState.style.display = '';
+    hasMessages = false;
+
+    // Clear and focus composer
+    composer.value = '';
+    updateSendState();
+    composer.focus();
+
+    // Scroll to top
+    chatArea.scrollTop = 0;
   });
 
   /* ── Message rendering ─────────────────────────────────────── */
