@@ -113,7 +113,7 @@ window.FinomAI.ChatEngine = (function () {
           richContent: [
             { type: 'text', value: 'Here\u2019s your current account overview:' },
             { type: 'card', title: 'Account Balance', fields: [{ label: 'Total balance', value: bal.total || 'N/A' }].concat(walletFields) },
-            { type: 'action_suggestion', text: 'View dashboard', action: 'dashboard.html' }
+            { type: 'action_suggestion', text: 'View dashboard', action: 'index.html' }
           ]
         };
       }

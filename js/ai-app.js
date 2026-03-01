@@ -17,8 +17,8 @@
 
   /* ── Back button ───────────────────────────────────────────── */
   backBtn.addEventListener('click', function () {
-    var map = { dashboard: 'dashboard.html', transactions: 'transactions.html', 'get-paid': 'get-paid.html', more: 'more.html' };
-    window.location.href = map[previousScreen] || 'dashboard.html';
+    var map = { dashboard: 'index.html', transactions: 'transactions.html', 'get-paid': 'get-paid.html', more: 'more.html' };
+    window.location.href = map[previousScreen] || 'index.html';
   });
 
   /* ── Message rendering ─────────────────────────────────────── */
