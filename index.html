@@ -156,17 +156,9 @@
     .finom-logo {
       width: 32px;
       height: 32px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #ff6fa3, #ff3c7a);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      color: #fff;
+      border-radius: 8px;
       flex-shrink: 0;
-      font-style: italic;
-      letter-spacing: -0.3px;
+      object-fit: cover;
     }
     .wallet-name {
       flex: 1;
@@ -340,37 +332,56 @@
       white-space: nowrap;
     }
 
-    /* ── Team widget ──────────────────────────────────────────── */
-    .team-inner { padding: 16px; }
-    .team-title {
-      font-size: 17px;
-      font-weight: 600;
-      color: #242424;
-      line-height: 22px;
-      margin-bottom: 10px;
-    }
-    .team-desc {
-      font-size: 11px;
-      font-weight: 400;
-      color: #0b002e;
-      line-height: 16px;
-      margin-bottom: 14px;
-    }
-    .team-footer {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-    }
-    .team-illustration {
-      width: 93px;
-      height: 93px;
-      border-radius: 4px;
-      background: #f0f0f8;
+    /* ── Cash flow count badge ────────────────────────────────── */
+    .cashflow-badge {
+      width: 32px;
+      height: 32px;
+      background: rgba(37, 78, 92, 0.12);
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      font-size: 13px;
+      font-weight: 500;
+      color: #242424;
+      flex-shrink: 0;
     }
+
+    /* ── Team avatar widget ───────────────────────────────────── */
+    .team-avatars-row {
+      display: flex;
+      gap: 8px;
+      padding: 4px 16px 16px;
+      overflow-x: auto;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .team-avatars-row::-webkit-scrollbar { display: none; }
+    .team-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      font-weight: 600;
+      overflow: hidden;
+      position: relative;
+    }
+    .team-avatar--photo {
+      border: 1px solid rgba(37, 78, 92, 0.16);
+      background: #fff;
+    }
+    .team-avatar--photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .team-avatar--yellow { background: #fae4a7; color: #d09900; }
+    .team-avatar--pink   { background: #ffb3e1; color: #ed39a5; }
+    .team-avatar--add    { background: rgba(37, 78, 92, 0.12); color: #242424; font-weight: 400; font-size: 22px; }
 
     /* ── Customizer widget ────────────────────────────────────── */
     .customizer {
@@ -517,7 +528,7 @@
       <button class="qa-btn dark">
         <span class="qa-label">Add<br>money</span>
         <div class="qa-icon">
-          <img src="https://www.figma.com/api/mcp/asset/7113134d-ba97-4c77-9993-33ce3dcfb548" alt="" width="24" height="24">
+          <img src="https://www.figma.com/api/mcp/asset/cbada27a-53e3-4324-b520-b8fc43538e78" alt="" width="24" height="24">
         </div>
       </button>
       <button class="qa-btn light">
@@ -555,7 +566,7 @@
       </div>
       <div class="row-divider"></div>
       <div class="wallet-row">
-        <div class="finom-logo">fi</div>
+        <img class="finom-logo" src="https://www.figma.com/api/mcp/asset/4c84f745-b916-41ed-b7e9-ba9eabcc8ef0" alt="Finom">
         <span class="wallet-name">Main</span>
         <span class="wallet-balance">5 000,00 €</span>
         <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -647,13 +658,19 @@
         </svg>
       </div>
 
+      <!-- Receivables row -->
+      <div class="cashflow-row">
+        <div class="cashflow-badge">2</div>
+        <span class="row-label">Receivables</span>
+        <span class="row-value">+ 5 248,76 €</span>
+        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
       <!-- Payables row -->
       <div class="cashflow-row">
-        <div class="icon-block">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M14 8H2M9 3l5 5-5 5" stroke="#242424" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
+        <div class="cashflow-badge">1</div>
         <span class="row-label">Payables</span>
         <span class="row-value">– 3 981,45 €</span>
         <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -671,24 +688,20 @@
 
     <!-- TEAM WIDGET -->
     <div class="widget-card">
-      <div class="team-inner">
-        <div class="team-title">Manage All Team Expenses</div>
-        <div class="team-desc">
-          Simplify expense management with Finom: easily collaborate,
-          track expenses instantly, and streamline your finances.
+      <div class="widget-header">
+        <span class="widget-title">Team</span>
+        <button class="badge-btn">Show all</button>
+      </div>
+      <div class="team-avatars-row">
+        <div class="team-avatar team-avatar--photo">
+          <img src="https://www.figma.com/api/mcp/asset/64c27473-74d2-424d-bde2-2c712af8c75f" alt="">
         </div>
-        <div class="team-footer">
-          <button class="pill-btn">Learn more</button>
-          <div class="team-illustration">
-            <!-- Lottie placeholder – static representation of last frame -->
-            <svg width="70" height="70" viewBox="0 0 70 70" fill="none">
-              <circle cx="22" cy="22" r="13" fill="#e8e8f8" stroke="#c8c8f0" stroke-width="1"/>
-              <circle cx="46" cy="28" r="11" fill="#fce8f4" stroke="#f0c8e8" stroke-width="1"/>
-              <circle cx="18" cy="48" r="10" fill="#e8f8ec" stroke="#c8f0d4" stroke-width="1"/>
-              <circle cx="50" cy="52" r="8"  fill="#fff3e0" stroke="#ffd9a8" stroke-width="1"/>
-            </svg>
-          </div>
+        <div class="team-avatar team-avatar--photo">
+          <img src="https://www.figma.com/api/mcp/asset/64c27473-74d2-424d-bde2-2c712af8c75f" alt="">
         </div>
+        <div class="team-avatar team-avatar--yellow">FC</div>
+        <div class="team-avatar team-avatar--pink">AL</div>
+        <div class="team-avatar team-avatar--add">+</div>
       </div>
     </div>
 
@@ -762,7 +775,7 @@
 
       <!-- AI button -->
       <button class="ai-btn">
-        <img src="https://www.figma.com/api/mcp/asset/827b64a1-f7d3-470b-ae4e-bb74ea4e36b9" alt="AI assistant">
+        <img src="https://www.figma.com/api/mcp/asset/6a6616f9-99bc-4d7c-b430-ea83c80bec83" alt="AI assistant">
       </button>
     </div>
   </div>
