@@ -6,7 +6,8 @@
       "Bash(node --version)",
       "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); print\\(data[0][''text'']\\)\")",
       "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); text=data[0][''text'']; print\\(text[3000:]\\)\")",
-      "mcp__figma-remote-mcp__get_design_context"
+      "mcp__figma-remote-mcp__get_design_context",
+      "mcp__figma-remote-mcp__get_screenshot"
     ]
   }
 }

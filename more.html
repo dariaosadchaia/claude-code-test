@@ -44,52 +44,14 @@
 
     /* ── Page header ──────────────────────────────────────────── */
     .page-header {
-      padding: 8px 16px 16px;
+      padding: 4px 16px 12px;
     }
     .page-title {
-      font-size: 28px;
+      font-size: 23px;
       font-weight: 600;
       color: #242424;
-      line-height: 34px;
+      line-height: 30px;
     }
-
-    /* ── Profile card ─────────────────────────────────────────── */
-    .profile-card {
-      background: #fff;
-      border-radius: 20px;
-      margin: 0 16px 12px;
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .profile-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: 600;
-      color: #fff;
-      flex-shrink: 0;
-    }
-    .profile-info { flex: 1; }
-    .profile-name {
-      font-size: 17px;
-      font-weight: 600;
-      color: #242424;
-      line-height: 22px;
-    }
-    .profile-email {
-      font-size: 13px;
-      font-weight: 400;
-      color: rgba(36,47,51,0.64);
-      line-height: 18px;
-    }
-    .chev { flex-shrink: 0; }
 
     /* ── Content ──────────────────────────────────────────────── */
     .content {
@@ -99,67 +61,216 @@
       gap: 12px;
     }
 
-    /* ── Menu card ────────────────────────────────────────────── */
-    .menu-card {
+    /* ── Section headline ────────────────────────────────────── */
+    .section-headline {
+      font-size: 13px;
+      font-weight: 600;
+      color: #242424;
+      line-height: 13px;
+      letter-spacing: 1.04px;
+      text-transform: uppercase;
+      padding: 0;
+      height: 28px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* ── Card block ──────────────────────────────────────────── */
+    .card {
       background: #fff;
       border-radius: 20px;
       overflow: hidden;
+      padding: 8px 0;
     }
-    .menu-section-label {
-      font-size: 13px;
-      font-weight: 500;
-      color: rgba(36,47,51,0.64);
-      padding: 14px 16px 6px;
-    }
-    .menu-row {
+
+    /* ── Cell row ────────────────────────────────────────────── */
+    .cell {
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 12px 16px;
+      padding: 0 16px;
       cursor: pointer;
+      transition: background 0.15s;
     }
-    .menu-row + .menu-row {
-      border-top: 1px solid rgba(36,47,51,0.06);
+    .cell:active { background: rgba(37, 78, 92, 0.04); }
+    .cell__left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
     }
-    .menu-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+    .cell__text {
+      padding: 14px 0;
+    }
+    .cell__title {
+      font-size: 17px;
+      font-weight: 400;
+      color: #242424;
+      line-height: 22px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cell__right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-left: 16px;
+      flex-shrink: 0;
+    }
+    .cell__chevron {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
+    }
+
+    /* ── Avatar ──────────────────────────────────────────────── */
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid rgba(37, 78, 92, 0.16);
+      position: relative;
+      background: #fff;
+    }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .avatar--letter {
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 16px;
+      font-weight: 500;
+      color: #fff;
+      border: none;
+    }
+
+    /* ── Icon 24px ───────────────────────────────────────────── */
+    .icon-24 {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #242424;
+    }
+
+    /* ── Divider ─────────────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: rgba(37, 78, 92, 0.08);
+      margin: 0 16px;
+    }
+
+    /* ── Badge ───────────────────────────────────────────────── */
+    .badge-counter {
+      background: #fe42b4;
+      border: 2px solid #fff;
+      border-radius: 100px;
+      height: 20px;
+      min-width: 20px;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 12px;
+    }
+    .badge-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #fe42b4;
+      border: 2px solid #fff;
       flex-shrink: 0;
     }
-    .menu-icon.blue    { background: rgba(26,122,255,0.12); }
-    .menu-icon.green   { background: rgba(47,168,79,0.12); }
-    .menu-icon.purple  { background: rgba(155,89,182,0.12); }
-    .menu-icon.orange  { background: rgba(245,166,35,0.12); }
-    .menu-icon.teal    { background: rgba(37,78,92,0.12); }
-    .menu-icon.red     { background: rgba(231,76,60,0.12); }
-    .menu-icon.gray    { background: rgba(37,78,92,0.08); }
-    .menu-label {
+
+    /* ── Featured card (Receipts) ─────────────────────────────── */
+    .featured-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .featured-card:active { background: rgba(37, 78, 92, 0.04); }
+    .featured-card__content {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .featured-card__title {
+      font-size: 17px;
+      font-weight: 400;
+      color: #242424;
+      line-height: 22px;
+    }
+    .featured-card__sub {
+      font-size: 13px;
+      font-weight: 400;
+      color: #242424;
+      opacity: 0.5;
+      line-height: 20px;
+    }
+
+    /* ── Side-by-side cards ───────────────────────────────────── */
+    .dual-cards {
+      display: flex;
+      gap: 8px;
+    }
+    .dual-card {
+      flex: 1;
+      background: #fff;
+      border-radius: 20px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .dual-card:active { background: rgba(37, 78, 92, 0.04); }
+    .dual-card__content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .dual-card__icons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dual-card__label {
       font-size: 15px;
       font-weight: 400;
       color: #242424;
-      line-height: 20px;
-    }
-    .menu-badge {
-      background: #e74c3c;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 600;
-      border-radius: 10px;
-      padding: 2px 7px;
-      line-height: 14px;
+      line-height: 22px;
     }
 
-    /* ── App version ──────────────────────────────────────────── */
+    /* ── Section wrapper ─────────────────────────────────────── */
+    .section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── App version ─────────────────────────────────────────── */
     .app-version {
-      text-align: center;
-      font-size: 11px;
-      color: rgba(36,47,51,0.35);
-      padding: 8px 0;
+      font-size: 15px;
+      font-weight: 400;
+      color: #242424;
+      line-height: 22px;
+      padding: 0 16px;
     }
 
     /* ── Bottom navigation ────────────────────────────────────── */
@@ -197,7 +308,7 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      padding: 7px 0 2px;
+      padding: 5px 0 2px;
       cursor: pointer;
       text-decoration: none;
     }
@@ -257,187 +368,450 @@
     <h1 class="page-title">More</h1>
   </div>
 
-  <!-- PROFILE CARD -->
-  <div class="profile-card">
-    <div class="profile-avatar">DO</div>
-    <div class="profile-info">
-      <div class="profile-name">Coralline LTD</div>
-      <div class="profile-email">admin@coralline.io</div>
-    </div>
-    <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </div>
-
   <!-- CONTENT -->
   <div class="content">
 
-    <!-- Business tools -->
-    <div class="menu-card">
-      <div class="menu-section-label">Business tools</div>
-
-      <div class="menu-row">
-        <div class="menu-icon blue">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <rect x="2" y="4" width="14" height="11" rx="2" stroke="#1a7aff" stroke-width="1.2" fill="none"/>
-            <path d="M2 7.5h14" stroke="#1a7aff" stroke-width="1.2"/>
-            <circle cx="5.5" cy="11" r="1" fill="#1a7aff"/>
+    <!-- Receipts & Reconciliation -->
+    <div class="featured-card">
+      <div class="featured-card__content">
+        <div class="icon-24">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M5 3h14a1 1 0 011 1v16.5l-2.5-1.5-2.5 1.5-2.5-1.5L10 20.5l-2.5-1.5L5 20.5V4a1 1 0 010-2z" stroke="#242424" stroke-width="1.25" stroke-linejoin="round" fill="none"/>
+            <path d="M9 8h6M9 12h4" stroke="#242424" stroke-width="1.25" stroke-linecap="round"/>
           </svg>
         </div>
-        <span class="menu-label">Cards</span>
-        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <div>
+          <div class="featured-card__title">Receipts &amp; Reconciliation</div>
+          <div class="featured-card__sub">3 unmatched</div>
+        </div>
       </div>
-
-      <div class="menu-row">
-        <div class="menu-icon green">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M3 9l4 4 8-8" stroke="#2fa84f" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <span class="menu-label">Approvals</span>
-        <span class="menu-badge">2</span>
-        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-
-      <div class="menu-row">
-        <div class="menu-icon purple">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M9 2v14M2 9h14" stroke="#9b59b6" stroke-width="1.3" stroke-linecap="round"/>
-            <circle cx="9" cy="9" r="7" stroke="#9b59b6" stroke-width="1.2" fill="none"/>
-          </svg>
-        </div>
-        <span class="menu-label">Accounting</span>
-        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-
-      <div class="menu-row">
-        <div class="menu-icon orange">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <circle cx="9" cy="6" r="3" stroke="#f5a623" stroke-width="1.2" fill="none"/>
-            <path d="M3 15c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#f5a623" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-          </svg>
-        </div>
-        <span class="menu-label">Team members</span>
-        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-
-      <div class="menu-row">
-        <div class="menu-icon teal">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <rect x="3" y="3" width="5" height="5" rx="1" stroke="#254e5c" stroke-width="1.2" fill="none"/>
-            <rect x="10" y="3" width="5" height="5" rx="1" stroke="#254e5c" stroke-width="1.2" fill="none"/>
-            <rect x="3" y="10" width="5" height="5" rx="1" stroke="#254e5c" stroke-width="1.2" fill="none"/>
-            <rect x="10" y="10" width="5" height="5" rx="1" stroke="#254e5c" stroke-width="1.2" fill="none"/>
-          </svg>
-        </div>
-        <span class="menu-label">Integrations</span>
-        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <div class="cell__right">
+        <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
     </div>
 
-    <!-- Settings -->
-    <div class="menu-card">
-      <div class="menu-section-label">Settings</div>
-
-      <div class="menu-row">
-        <div class="menu-icon gray">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <circle cx="9" cy="9" r="3" stroke="#242424" stroke-width="1.2" fill="none"/>
-            <path d="M9 2v2M9 14v2M2 9h2M14 9h2M4.2 4.2l1.4 1.4M12.4 12.4l1.4 1.4M4.2 13.8l1.4-1.4M12.4 5.6l1.4-1.4" stroke="#242424" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Referral + Cashback -->
+    <div class="dual-cards">
+      <div class="dual-card">
+        <div class="dual-card__content">
+          <div class="dual-card__icons">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="9" cy="7" r="3" stroke="#242424" stroke-width="1.25" fill="none"/>
+                <path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#242424" stroke-width="1.25" stroke-linecap="round" fill="none"/>
+                <path d="M19 8v6M16 11h6" stroke="#242424" stroke-width="1.25" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="badge-counter">+250 &euro;</div>
+          </div>
+          <div class="dual-card__label">Referral</div>
+        </div>
+        <div class="cell__right" style="padding-left:8px;">
+          <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <span class="menu-label">General settings</span>
-        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
       </div>
-
-      <div class="menu-row">
-        <div class="menu-icon gray">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <rect x="3" y="7" width="12" height="8" rx="2" stroke="#242424" stroke-width="1.2" fill="none"/>
-            <path d="M6 7V5a3 3 0 016 0v2" stroke="#242424" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-            <circle cx="9" cy="11" r="1" fill="#242424"/>
+      <div class="dual-card">
+        <div class="dual-card__content">
+          <div class="dual-card__icons">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M7 17L17 7M8 7h2v2M14 15h2v2" stroke="#242424" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="9" stroke="#242424" stroke-width="1.25" fill="none"/>
+              </svg>
+            </div>
+          </div>
+          <div class="dual-card__label">Cashback</div>
+        </div>
+        <div class="cell__right" style="padding-left:8px;">
+          <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <span class="menu-label">Security</span>
-        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-
-      <div class="menu-row">
-        <div class="menu-icon gray">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M14 11a5 5 0 00-10 0" stroke="#242424" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-            <circle cx="9" cy="14" r="2" stroke="#242424" stroke-width="1.2" fill="none"/>
-            <path d="M9 4v2" stroke="#242424" stroke-width="1.2" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <span class="menu-label">Notifications</span>
-        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
       </div>
     </div>
 
-    <!-- Support -->
-    <div class="menu-card">
-      <div class="menu-section-label">Support</div>
-
-      <div class="menu-row">
-        <div class="menu-icon gray">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <circle cx="9" cy="9" r="7" stroke="#242424" stroke-width="1.2" fill="none"/>
-            <circle cx="9" cy="9" r="3" stroke="#242424" stroke-width="1.2" fill="none"/>
-            <path d="M9 2v4M9 12v4M2 9h4M12 9h4" stroke="#242424" stroke-width="1.2" stroke-linecap="round"/>
-          </svg>
+    <!-- PERSONAL section -->
+    <div class="section">
+      <div class="section-headline">Personal</div>
+      <div class="card">
+        <!-- Profile row -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/80?img=47" alt="">
+            </div>
+            <div class="cell__text">
+              <div class="cell__title">Gisela M&ouml;ller</div>
+            </div>
+          </div>
         </div>
-        <span class="menu-label">Help center</span>
-        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-
-      <div class="menu-row">
-        <div class="menu-icon gray">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M3 4h12a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1z" stroke="#242424" stroke-width="1.2" fill="none"/>
-            <path d="M2 5l7 5 7-5" stroke="#242424" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+        <div class="divider"></div>
+        <!-- Personal Info -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="4" stroke="#242424" stroke-width="1.25" fill="none"/>
+                <path d="M4 20c0-3.5 3.6-6.5 8-6.5s8 3 8 6.5" stroke="#242424" stroke-width="1.25" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="cell__text">
+              <div class="cell__title">Personal Info</div>
+            </div>
+          </div>
+          <div class="cell__right">
+            <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
         </div>
-        <span class="menu-label">Contact support</span>
-        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-
-      <div class="menu-row">
-        <div class="menu-icon red">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M6 3l-3 3v6l3 3h6l3-3V6l-3-3H6z" stroke="#e74c3c" stroke-width="1.2" fill="none"/>
-            <path d="M9 6v4" stroke="#e74c3c" stroke-width="1.2" stroke-linecap="round"/>
-            <circle cx="9" cy="12.5" r="0.8" fill="#e74c3c"/>
-          </svg>
+        <!-- Security -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="5" y="10" width="14" height="10" rx="2.5" stroke="#242424" stroke-width="1.25" fill="none"/>
+                <path d="M8 10V7a4 4 0 018 0v3" stroke="#242424" stroke-width="1.25" stroke-linecap="round" fill="none"/>
+                <circle cx="12" cy="15" r="1.5" fill="#242424"/>
+              </svg>
+            </div>
+            <div class="cell__text">
+              <div class="cell__title">Security</div>
+            </div>
+          </div>
+          <div class="cell__right">
+            <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
         </div>
-        <span class="menu-label" style="color:#e74c3c;">Report a problem</span>
-        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <!-- Notifications -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9z" stroke="#242424" stroke-width="1.25" stroke-linejoin="round" fill="none"/>
+                <path d="M13.73 21a2 2 0 01-3.46 0" stroke="#242424" stroke-width="1.25" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="cell__text">
+              <div class="cell__title">Notifications</div>
+            </div>
+          </div>
+          <div class="cell__right">
+            <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="app-version">Finom v4.12.0 (1087)</div>
+    <!-- BUSINESS section -->
+    <div class="section">
+      <div class="section-headline">Business</div>
+      <div class="card">
+        <!-- Company row -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="avatar avatar--letter" style="background: #4a9b8e;">T</div>
+            <div class="cell__text">
+              <div class="cell__title">Tesla S.R.L.</div>
+            </div>
+          </div>
+          <div class="cell__right">
+            <div class="badge-counter" style="min-width:auto;padding:0 5px;font-size:11px;height:18px;">9</div>
+            <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <!-- Business info -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="7" width="18" height="13" rx="2" stroke="#242424" stroke-width="1.25" fill="none"/>
+                <path d="M8 7V5a4 4 0 018 0v2" stroke="#242424" stroke-width="1.25" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="cell__text">
+              <div class="cell__title">Business info</div>
+            </div>
+          </div>
+          <div class="cell__right">
+            <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Team -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="9" cy="8" r="3" stroke="#242424" stroke-width="1.25" fill="none"/>
+                <path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#242424" stroke-width="1.25" stroke-linecap="round" fill="none"/>
+                <circle cx="17" cy="9" r="2.5" stroke="#242424" stroke-width="1.25" fill="none"/>
+                <path d="M19.5 20c0-2.5-1.8-4.5-4-5" stroke="#242424" stroke-width="1.25" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="cell__text">
+              <div class="cell__title">Team</div>
+            </div>
+          </div>
+          <div class="cell__right">
+            <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Cards -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="5" width="20" height="14" rx="2.5" stroke="#242424" stroke-width="1.25" fill="none"/>
+                <path d="M2 10h20" stroke="#242424" stroke-width="1.25"/>
+                <circle cx="6.5" cy="15" r="1" fill="#242424"/>
+              </svg>
+            </div>
+            <div class="cell__text">
+              <div class="cell__title">Cards</div>
+            </div>
+          </div>
+          <div class="cell__right">
+            <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Invoices -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="5" y="2" width="14" height="20" rx="2" stroke="#242424" stroke-width="1.25" fill="none"/>
+                <path d="M9 7h6M9 11h4M9 15h6" stroke="#242424" stroke-width="1.25" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="cell__text">
+              <div class="cell__title">Invoices</div>
+            </div>
+          </div>
+          <div class="cell__right">
+            <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <!-- E-Invoices -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="5" y="2" width="14" height="20" rx="2" stroke="#242424" stroke-width="1.25" fill="none"/>
+                <path d="M9 7h6M9 11h4" stroke="#242424" stroke-width="1.25" stroke-linecap="round"/>
+                <path d="M13 15l2 2 3-4" stroke="#242424" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="cell__text">
+              <div class="cell__title">E-Invoices</div>
+            </div>
+          </div>
+          <div class="cell__right">
+            <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Goods and services -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" stroke="#242424" stroke-width="1.25" stroke-linejoin="round" fill="none"/>
+                <path d="M3 6h18" stroke="#242424" stroke-width="1.25"/>
+                <path d="M16 10a4 4 0 01-8 0" stroke="#242424" stroke-width="1.25" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="cell__text">
+              <div class="cell__title">Goods and services</div>
+            </div>
+          </div>
+          <div class="cell__right">
+            <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Special offers -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L9.5 8.5H3l5.5 4L6 19l6-4 6 4-2.5-6.5 5.5-4h-6.5L12 2z" stroke="#242424" stroke-width="1.25" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="cell__text">
+              <div class="cell__title">Special offers</div>
+            </div>
+          </div>
+          <div class="cell__right">
+            <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Legal & Inbox -->
+        <div class="cell">
+          <div class="cell__left">
+            <div class="icon-24">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="#242424" stroke-width="1.25" fill="none"/>
+                <path d="M22 6l-10 7L2 6" stroke="#242424" stroke-width="1.25" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="cell__text">
+              <div class="cell__title">Legal &amp; Inbox</div>
+            </div>
+          </div>
+          <div class="cell__right">
+            <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other section -->
+    <div class="card">
+      <!-- App settings -->
+      <div class="cell">
+        <div class="cell__left">
+          <div class="icon-24">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="3" stroke="#242424" stroke-width="1.25" fill="none"/>
+              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="#242424" stroke-width="1.25" fill="none"/>
+            </svg>
+          </div>
+          <div class="cell__text">
+            <div class="cell__title">App settings</div>
+          </div>
+        </div>
+        <div class="cell__right">
+          <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <!-- Integrations -->
+      <div class="cell">
+        <div class="cell__left">
+          <div class="icon-24">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#242424" stroke-width="1.25" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="cell__text">
+            <div class="cell__title">Integrations</div>
+          </div>
+        </div>
+        <div class="cell__right">
+          <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <!-- Suggest idea -->
+      <div class="cell">
+        <div class="cell__left">
+          <div class="icon-24">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M9 21h6M12 3a6 6 0 00-4 10.5V17h8v-3.5A6 6 0 0012 3z" stroke="#242424" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="cell__text">
+            <div class="cell__title">Suggest idea</div>
+          </div>
+        </div>
+        <div class="cell__right">
+          <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <!-- Help center -->
+      <div class="cell">
+        <div class="cell__left">
+          <div class="icon-24">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="#242424" stroke-width="1.25" fill="none"/>
+              <circle cx="12" cy="12" r="4" stroke="#242424" stroke-width="1.25" fill="none"/>
+              <path d="M12 3v5M12 16v5M3 12h5M16 12h5" stroke="#242424" stroke-width="1.25" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="cell__text">
+            <div class="cell__title">Help center</div>
+          </div>
+        </div>
+        <div class="cell__right">
+          <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <!-- Contact Us -->
+      <div class="cell">
+        <div class="cell__left">
+          <div class="icon-24">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="#242424" stroke-width="1.25" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="cell__text">
+            <div class="cell__title">Contact Us</div>
+          </div>
+        </div>
+        <div class="cell__right">
+          <div class="badge-dot"></div>
+          <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sign Out -->
+    <div class="card">
+      <div class="cell">
+        <div class="cell__left">
+          <div class="icon-24">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="#242424" stroke-width="1.25" stroke-linecap="round" fill="none"/>
+              <path d="M16 17l5-5-5-5M21 12H9" stroke="#242424" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="cell__text">
+            <div class="cell__title">Sign Out</div>
+          </div>
+        </div>
+        <div class="cell__right">
+          <svg class="cell__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- App version -->
+    <div class="app-version">App version 1.60.0</div>
 
   </div>
 
@@ -484,8 +858,8 @@
           <span class="tab-label">More</span>
         </a>
       </div>
-      <button class="ai-btn">
-        <img src="https://www.figma.com/api/mcp/asset/827b64a1-f7d3-470b-ae4e-bb74ea4e36b9" alt="AI assistant" width="26" height="29">
+      <button class="ai-btn" id="ai-btn">
+        <img src="https://www.figma.com/api/mcp/asset/827b64a1-f7d3-470b-ae4e-bb74ea4e36b9" alt="AI" width="26" height="29">
       </button>
     </div>
   </div>
@@ -495,20 +869,14 @@
 <script src="js/app-context.js"></script>
 <script>
 (function () {
-  var ctx = { currentScreen: 'more' };
-
-  var emailEl = document.querySelector('.profile-email');
-  if (emailEl) ctx.userEmail = emailEl.textContent.trim();
-
-  var nameEl = document.querySelector('.profile-name');
-  if (nameEl) ctx.companyName = nameEl.textContent.trim();
-
-  var badgeEl = document.querySelector('.menu-badge');
-  if (badgeEl) ctx.pendingApprovals = parseInt(badgeEl.textContent, 10) || 0;
-
+  var ctx = {
+    currentScreen: 'more',
+    companyName: 'Tesla S.R.L.',
+    userEmail: 'gisela@tesla-srl.com'
+  };
   FinomAI.AppContext.update(ctx);
 
-  document.querySelector('.ai-btn').addEventListener('click', function () {
+  document.getElementById('ai-btn').addEventListener('click', function () {
     window.location.href = 'ai.html';
   });
 })();

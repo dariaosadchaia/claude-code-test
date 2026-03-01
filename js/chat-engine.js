@@ -280,12 +280,21 @@ window.FinomAI.ChatEngine = (function () {
     notify();
   }
 
+  /** Load saved messages silently (no notification per message). */
+  function loadMessages(savedMsgs) {
+    messages = [];
+    savedMsgs.forEach(function (m) {
+      messages.push(m);
+    });
+  }
+
   return {
     sendUserMessage: sendUserMessage,
     getMessages: getMessages,
     getIsSending: getIsSending,
     onMessagesChange: onMessagesChange,
     addMessage: addMessage,
-    reset: reset
+    reset: reset,
+    loadMessages: loadMessages
   };
 })();
