@@ -7,6 +7,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    @view-transition { navigation: auto; }
+    ::view-transition-group(ai-btn) { animation-duration: 300ms; animation-timing-function: ease-in-out; }
+    ::view-transition-old(ai-btn) { animation: 300ms ease-in-out both vt-ai-exit; }
+    ::view-transition-new(ai-btn) { animation: none; opacity: 0; }
+    @keyframes vt-ai-exit { to { opacity: 0; transform: scale(0.6); } }
 
     body {
       background: #F6F6F6;
@@ -662,6 +667,26 @@
       font-size: 14px;
     }
     .history-empty svg { opacity: 0.3; }
+
+    /* ── Ghost AI button (view-transition target) ─────────── */
+    .ai-btn-ghost {
+      position: fixed;
+      bottom: 32px;
+      right: 20px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(150deg, rgba(169,142,242,0.3) 12%, rgba(254,66,180,0.3) 78%);
+      border: 1px solid rgba(0,0,0,0.1);
+      box-shadow: 0 9px 16px rgba(0,0,0,0.09);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      view-transition-name: ai-btn;
+    }
+    .ai-btn-ghost img { width: 26px; height: 29px; }
   </style>
 </head>
 <body>
@@ -840,9 +865,23 @@
     <p class="composer-disclaimer">Assistant might make mistakes while the service is in beta</p>
   </div>
 
+  <!-- Ghost AI button for view-transition -->
+  <div class="ai-btn-ghost" aria-hidden="true">
+    <img src="https://www.figma.com/api/mcp/asset/827b64a1-f7d3-470b-ae4e-bb74ea4e36b9" alt="" width="26" height="29">
+  </div>
+
 </div><!-- /screen -->
 </div><!-- /device-frame -->
 
+<script>
+/* Reveal the ghost AI button right before the browser takes the old-page
+   snapshot so the view-transition animates a visible element back to the
+   destination page — gives a seamless "button reappears" effect. */
+document.addEventListener('pageswap', function () {
+  var g = document.querySelector('.ai-btn-ghost');
+  if (g) g.style.opacity = '1';
+});
+</script>
 <script src="js/app-context.js"></script>
 <script src="js/tool-registry.js"></script>
 <script src="js/message-renderer.js"></script>
