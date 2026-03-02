@@ -30,22 +30,76 @@ window.FinomAI.ChatEngine = (function () {
     return new Promise(function (resolve) { setTimeout(resolve, ms); });
   }
 
-  /* ── Mock answers for known prompts ────────────────────────── */
+  /* ── Widget responses for known prompts ─────────────────────── */
 
-  var mockAnswers = {
-    'how can i get a loan on favorable terms?':
-      'To get better loan terms, focus on three levers:\n• predictable cash flow\n• clean financials and tax status\n• competing offers from multiple providers\n\nFor a quick start: prepare last 6–12 months of revenue, main expense categories, existing liabilities, and any collateral. Then compare APR, fees, early repayment rules, and guarantees.\n\nIf you tell me your monthly revenue range and legal form (sole trader / LTD), I\'ll suggest what lenders typically prioritize and what to improve first.',
+  var widgetAnswers = {
+    'how can i get a loan on favorable terms?': {
+      content: 'Here are loan options matching your business profile.',
+      richContent: [
+        { type: 'text', value: 'Based on your avg. monthly revenue of €42,300 (last 6 mo.).' },
+        { type: 'card', title: 'Best Match — Finom Business Loan', fields: [
+          { label: 'Amount available', value: 'up to €75,000' },
+          { label: 'APR', value: '4.9%' },
+          { label: 'Term', value: '12–36 months' },
+          { label: 'Approval time', value: '~2 business days' }
+        ]},
+        { type: 'list', items: [
+          { title: 'KfW SME Loan', subtitle: 'Via partner bank · lower rate', trailing: '3.8% APR' },
+          { title: 'Iwoca Flexi-Loan', subtitle: 'Instant decision · flexible', trailing: '6.2% APR' },
+          { title: 'Finom Revenue Advance', subtitle: 'Repaid from card receipts', trailing: '7.1% APR' }
+        ]},
+        { type: 'button_group', buttons: [
+          { label: 'Apply now', action: { type: 'navigate', payload: { screen: 'loan_application' } } },
+          { label: 'Compare all rates', action: { type: 'send_message', payload: { text: 'Compare all loan rates for my business' } } },
+          { label: 'Check eligibility', action: { type: 'send_message', payload: { text: 'What are the loan eligibility requirements?' } } }
+        ]}
+      ]
+    },
 
-    'how can i earn income from my savings?':
-      'It depends on your horizon and risk comfort.\n\nLow risk:\n• high-yield savings / deposits\n• money market funds (where available)\n\nMedium risk:\n• bond ETFs or a diversified conservative portfolio\n\nRule of thumb: keep an emergency fund (3–6 months), and don\'t lock all cash long-term.\n\nTell me the currency, time horizon, and whether you can tolerate price swings, and I\'ll propose a simple allocation + what metrics to track.',
+    'how can i earn income from my savings?': {
+      content: 'Your idle cash can earn up to €1,410/year at current rates.',
+      richContent: [
+        { type: 'text', value: 'You have ~€18,400 in your current account earning 0%.' },
+        { type: 'card', title: 'Savings Options — Jun 2025 Rates', fields: [
+          { label: 'Finom Savings Account', value: '3.25% p.a. (instant access)' },
+          { label: 'Money Market Fund', value: '3.8% p.a. (T+1 liquidity)' },
+          { label: '12-mo Fixed Deposit', value: '4.1% p.a. (locked 12 mo.)' }
+        ]},
+        { type: 'markdown', value: 'Moving €18,400 to a 12-mo deposit earns ~€754/year.\nFinom Savings gives €599/year with instant access.\nRecommendation: split €10K into fixed deposit, keep €8.4K liquid.' },
+        { type: 'button_group', buttons: [
+          { label: 'Open Savings Account', action: { type: 'navigate', payload: { screen: 'savings_open' } } },
+          { label: 'Set up fixed deposit', action: { type: 'navigate', payload: { screen: 'deposit_setup' } } },
+          { label: 'View projections', action: { type: 'send_message', payload: { text: 'Show me savings projections for 12 months' } } }
+        ]}
+      ]
+    },
 
-    'how can i accept payments via qr?':
-      'There are two common QR approaches:\n• static QR (customer enters amount)\n• dynamic QR (amount + order details included)\n\nFor retail checkout, dynamic QR reduces mistakes and speeds up payment confirmation.\nIn a prototype you can simulate this flow:\n1) show QR modal\n2) "confirm payment" after a delay\n3) mark order as Paid\n\nDo you want the QR to behave like bank transfer QR (IBAN/SEPA) or wallet/card QR?'
+    'how can i accept payments via qr?': {
+      content: 'QR payments are ready to activate on your account.',
+      richContent: [
+        { type: 'card', title: 'QR Payment Status', fields: [
+          { label: 'Type', value: 'Dynamic SEPA QR' },
+          { label: 'Max per transaction', value: '€9,999' },
+          { label: 'Settlement', value: 'Same business day' },
+          { label: 'Status', value: 'Not activated' }
+        ]},
+        { type: 'list', items: [
+          { title: '1 · Enable QR in Settings', subtitle: 'Takes ~30 sec', trailing: '' },
+          { title: '2 · Generate QR per invoice', subtitle: 'Amount is pre-filled automatically', trailing: '' },
+          { title: '3 · Share or display QR', subtitle: 'Customer scans → instant SEPA transfer', trailing: '' }
+        ]},
+        { type: 'button_group', buttons: [
+          { label: 'Activate QR payments', action: { type: 'navigate', payload: { screen: 'qr_settings' } } },
+          { label: 'Create invoice with QR', action: { type: 'navigate', payload: { screen: 'get-paid' } } },
+          { label: 'See fee comparison', action: { type: 'send_message', payload: { text: 'Compare QR payment fees vs card terminal' } } }
+        ]}
+      ]
+    }
   };
 
-  function findMockAnswer(text) {
+  function findWidgetAnswer(text) {
     var key = text.trim().toLowerCase().replace(/\.\s*$/, '');
-    return mockAnswers[key] || null;
+    return widgetAnswers[key] || null;
   }
 
   /* ── Send a user message and simulate AI response ──────────── */
@@ -56,11 +110,11 @@ window.FinomAI.ChatEngine = (function () {
 
     addMessage({ role: 'user', content: text });
 
-    var mock = findMockAnswer(text);
-    if (mock) {
+    var widget = findWidgetAnswer(text);
+    if (widget) {
       return delay(700 + Math.floor(Math.random() * 500))
         .then(function () {
-          addMessage({ role: 'assistant', content: mock });
+          addMessage({ role: 'assistant', content: widget.content, richContent: widget.richContent });
         })
         .then(function () { isSending = false; });
     }
@@ -117,15 +171,12 @@ window.FinomAI.ChatEngine = (function () {
     function xPos(i) { return padL + (i / (data.length - 1)) * chartW; }
     function yPos(v) { return padT + chartH - ((v - minV) / (maxV - minV)) * chartH; }
 
-    var pts = data.map(function (v, i) {
-      return xPos(i).toFixed(1) + ',' + yPos(v).toFixed(1);
-    });
+    var pts = data.map(function (v, i) { return xPos(i).toFixed(1) + ',' + yPos(v).toFixed(1); });
     var linePoints = pts.join(' ');
     var areaPoints = linePoints + ' ' + xPos(11).toFixed(1) + ',' + (padT + chartH) + ' ' + xPos(0).toFixed(1) + ',' + (padT + chartH);
 
-    var gridVals = [7000, 8000, 9000, 10000];
     var grid = '';
-    gridVals.forEach(function (v) {
+    [7000, 8000, 9000, 10000].forEach(function (v) {
       var yy = yPos(v);
       grid += '<line x1="' + padL + '" y1="' + yy.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + yy.toFixed(1) + '" stroke="#e0e3e6" stroke-width="0.5" stroke-dasharray="4 3"/>';
       grid += '<text x="' + (padL - 6) + '" y="' + (yy + 3).toFixed(1) + '" text-anchor="end" fill="#999" font-size="9" font-family="Poppins,sans-serif">' + (v / 1000) + 'k</text>';
@@ -148,8 +199,7 @@ window.FinomAI.ChatEngine = (function () {
       '</linearGradient></defs>' +
       '<polygon points="' + areaPoints + '" fill="url(#ag)"/>' +
       '<polyline points="' + linePoints + '" fill="none" stroke="#7c5cfc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
-      dots + labels +
-      '</svg>';
+      dots + labels + '</svg>';
 
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   }
@@ -191,7 +241,6 @@ window.FinomAI.ChatEngine = (function () {
       var savH = bh(c.savings);
       var effH = fullH - savH;
       var fullY = by(c.current);
-
       defs += '<clipPath id="bp' + i + '"><rect x="' + x.toFixed(1) + '" y="' + fullY.toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + fullH.toFixed(1) + '" rx="4"/></clipPath>';
       bars += '<g clip-path="url(#bp' + i + ')">';
       bars += '<rect x="' + x.toFixed(1) + '" y="' + fullY.toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + savH.toFixed(1) + '" fill="#fe42b4" opacity="0.35"/>';
@@ -209,8 +258,55 @@ window.FinomAI.ChatEngine = (function () {
     var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
     svg += '<defs>' + defs + '</defs>';
     svg += '<rect width="' + w + '" height="' + h + '" fill="#f8f8fa" rx="12"/>';
-    svg += grid + bars + legend;
-    svg += '</svg>';
+    svg += grid + bars + legend + '</svg>';
+
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  }
+
+  function generateCardsSVG() {
+    var months = ['Jan','Feb','Mar','Apr','May','Jun'];
+    var fees   = [310, 295, 340, 280, 330, 420];
+    var capped = [190, 190, 190, 190, 190, 190];
+    var w = 300, h = 180;
+    var padL = 36, padR = 12, padT = 16, padB = 28;
+    var chartW = w - padL - padR;
+    var chartH = h - padT - padB;
+    var maxV = 500;
+
+    function xPos(i) { return padL + (i / (months.length - 1)) * chartW; }
+    function yPos(v) { return padT + chartH - (v / maxV) * chartH; }
+
+    var feesPts = fees.map(function (v, i) { return xPos(i).toFixed(1) + ',' + yPos(v).toFixed(1); }).join(' ');
+    var cappedPts = capped.map(function (v, i) { return xPos(i).toFixed(1) + ',' + yPos(v).toFixed(1); }).join(' ');
+    var areaFees = feesPts + ' ' + xPos(5).toFixed(1) + ',' + (padT + chartH) + ' ' + xPos(0).toFixed(1) + ',' + (padT + chartH);
+
+    var grid = '';
+    [100, 200, 300, 400].forEach(function (v) {
+      var yy = yPos(v);
+      grid += '<line x1="' + padL + '" y1="' + yy.toFixed(1) + '" x2="' + (w - padR) + '" y2="' + yy.toFixed(1) + '" stroke="#e0e3e6" stroke-width="0.5" stroke-dasharray="4 3"/>';
+      grid += '<text x="' + (padL - 6) + '" y="' + (yy + 3).toFixed(1) + '" text-anchor="end" fill="#999" font-size="9" font-family="Poppins,sans-serif">' + v + '</text>';
+    });
+
+    var labels = months.map(function (m, i) {
+      return '<text x="' + xPos(i).toFixed(1) + '" y="' + (h - 6) + '" text-anchor="middle" fill="#999" font-size="9" font-family="Poppins,sans-serif">' + m + '</text>';
+    }).join('');
+
+    var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+    svg += '<rect width="' + w + '" height="' + h + '" fill="#f8f8fa" rx="12"/>';
+    svg += '<defs><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fe42b4" stop-opacity="0.15"/><stop offset="100%" stop-color="#fe42b4" stop-opacity="0.01"/></linearGradient></defs>';
+    svg += grid;
+    svg += '<polygon points="' + areaFees + '" fill="url(#fg)"/>';
+    svg += '<polyline points="' + feesPts + '" fill="none" stroke="#fe42b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+    svg += '<polyline points="' + cappedPts + '" fill="none" stroke="#7c5cfc" stroke-width="1.5" stroke-dasharray="5 3" stroke-linecap="round"/>';
+    fees.forEach(function (v, i) {
+      svg += '<circle cx="' + xPos(i).toFixed(1) + '" cy="' + yPos(v).toFixed(1) + '" r="3" fill="#fe42b4" stroke="#fff" stroke-width="1.5"/>';
+    });
+    var legendY = h - 28;
+    svg += '<rect x="' + padL + '" y="' + legendY + '" width="8" height="2" fill="#fe42b4" rx="1"/>';
+    svg += '<text x="' + (padL + 12) + '" y="' + (legendY + 4) + '" fill="#666" font-size="8" font-family="Poppins,sans-serif">Current card fees</text>';
+    svg += '<line x1="' + (padL + 95) + '" y1="' + (legendY + 1) + '" x2="' + (padL + 103) + '" y2="' + (legendY + 1) + '" stroke="#7c5cfc" stroke-width="1.5" stroke-dasharray="3 2"/>';
+    svg += '<text x="' + (padL + 107) + '" y="' + (legendY + 4) + '" fill="#666" font-size="8" font-family="Poppins,sans-serif">Finom cap (€190/mo)</text>';
+    svg += labels + '</svg>';
 
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   }
@@ -222,6 +318,8 @@ window.FinomAI.ChatEngine = (function () {
       return { intent: 'chart_budget', toolCalls: [{ name: 'list_transactions', args: { limit: 12 } }, { name: 'get_spending_by_category', args: {} }] };
     if (lower.match(/inefficien|waste|optimiz.*spend/))
       return { intent: 'chart_inefficiency', toolCalls: [{ name: 'get_spending_by_category', args: {} }] };
+    if (lower.match(/save.*card|card.*sav/))
+      return { intent: 'chart_cards', toolCalls: [{ name: 'get_cards', args: {} }] };
     if (lower.match(/chart|graph|visuali[sz]/))
       return { intent: 'chart_budget', toolCalls: [{ name: 'list_transactions', args: { limit: 12 } }, { name: 'get_spending_by_category', args: {} }] };
     if (lower.match(/create.+invoice|new invoice/))
@@ -254,11 +352,14 @@ window.FinomAI.ChatEngine = (function () {
           return { label: w.name, value: w.balance };
         });
         return {
-          content: 'Here\u2019s your current balance:',
+          content: 'Current balance: ' + (bal.total || 'N/A'),
           richContent: [
-            { type: 'text', value: 'Here\u2019s your current account overview:' },
             { type: 'card', title: 'Account Balance', fields: [{ label: 'Total balance', value: bal.total || 'N/A' }].concat(walletFields) },
-            { type: 'action_suggestion', text: 'View dashboard', action: 'index.html' }
+            { type: 'button_group', buttons: [
+              { label: 'View dashboard', action: { type: 'navigate', payload: { screen: 'dashboard' } } },
+              { label: 'Cash flow forecast', action: { type: 'send_message', payload: { text: 'Show my cash flow forecast' } } },
+              { label: 'Move to savings', action: { type: 'send_message', payload: { text: 'How can I earn income from my savings?' } } }
+            ]}
           ]
         };
       }
@@ -267,13 +368,17 @@ window.FinomAI.ChatEngine = (function () {
         var txResult = toolResults.list_transactions || {};
         var txs = txResult.transactions || [];
         return {
-          content: 'Here are your recent transactions:',
+          content: txs.length + ' recent transactions found.',
           richContent: [
-            { type: 'text', value: 'Your ' + txs.length + ' most recent transactions:' },
+            { type: 'text', value: 'Last ' + txs.length + ' transactions:' },
             { type: 'list', items: txs.map(function (t) {
               return { title: t.name, subtitle: t.category + ' \u00b7 ' + t.date, trailing: t.amount };
             }) },
-            { type: 'action_suggestion', text: 'View all transactions', action: 'transactions.html' }
+            { type: 'button_group', buttons: [
+              { label: 'All transactions', action: { type: 'navigate', payload: { screen: 'transactions' } } },
+              { label: 'Spending breakdown', action: { type: 'send_message', payload: { text: 'Show spending breakdown by category' } } },
+              { label: 'Export CSV', action: { type: 'navigate', payload: { screen: 'export' } } }
+            ]}
           ]
         };
       }
@@ -281,14 +386,19 @@ window.FinomAI.ChatEngine = (function () {
       case 'invoices': {
         var invResult = toolResults.list_invoices || {};
         var invs = invResult.invoices || [];
+        var overdueCount = invs.filter(function (i) { return i.status === 'Overdue'; }).length;
         return {
-          content: 'Here are your invoices:',
+          content: invs.length + ' invoices, ' + overdueCount + ' overdue.',
           richContent: [
-            { type: 'text', value: 'You have ' + invs.length + ' invoices:' },
+            { type: 'text', value: invs.length + ' invoices total · ' + overdueCount + ' overdue' },
             { type: 'list', items: invs.map(function (i) {
-              return { title: i.id + ' \u00b7 ' + i.client, subtitle: i.detail, trailing: i.amount, badge: i.status };
+              return { title: i.id + ' · ' + i.client, subtitle: i.detail, trailing: i.amount, badge: i.status };
             }) },
-            { type: 'action_suggestion', text: 'Go to invoices', action: 'get-paid.html' }
+            { type: 'button_group', buttons: [
+              { label: 'Go to Invoices', action: { type: 'navigate', payload: { screen: 'get-paid' } } },
+              { label: 'Send reminders', action: { type: 'send_message', payload: { text: 'Send reminder for overdue invoices' } } },
+              { label: 'New invoice', action: { type: 'send_message', payload: { text: 'Create a new invoice' } } }
+            ]}
           ]
         };
       }
@@ -296,16 +406,19 @@ window.FinomAI.ChatEngine = (function () {
       case 'create_invoice': {
         var created = toolResults.create_invoice || {};
         return {
-          content: 'Invoice created!',
+          content: 'Invoice ' + (created.invoiceId || '') + ' created.',
           richContent: [
-            { type: 'text', value: 'I\u2019ve created a new invoice for you:' },
             { type: 'card', title: created.invoiceId || 'New Invoice', fields: [
               { label: 'Client', value: created.client || '' },
               { label: 'Amount', value: created.amount || '' },
               { label: 'Due date', value: created.dueDate || '' },
               { label: 'Status', value: created.status || 'Draft' }
-            ] },
-            { type: 'action_suggestion', text: 'Open Get Paid', action: 'get-paid.html' }
+            ]},
+            { type: 'button_group', buttons: [
+              { label: 'Send invoice', action: { type: 'navigate', payload: { screen: 'get-paid' } } },
+              { label: 'Add QR code', action: { type: 'send_message', payload: { text: 'How can I accept payments via QR?' } } },
+              { label: 'View all invoices', action: { type: 'navigate', payload: { screen: 'get-paid' } } }
+            ]}
           ]
         };
       }
@@ -313,13 +426,16 @@ window.FinomAI.ChatEngine = (function () {
       case 'reminder': {
         var rem = toolResults.send_invoice_reminder || {};
         return {
-          content: 'Reminder sent!',
+          content: 'Reminder sent for invoice ' + (rem.invoiceId || ''),
           richContent: [
-            { type: 'text', value: 'Done! I\u2019ve sent a payment reminder for the overdue invoice.' },
             { type: 'card', title: 'Reminder Sent', fields: [
               { label: 'Invoice', value: rem.invoiceId || '' },
               { label: 'Sent to', value: rem.sentTo || '' }
-            ] }
+            ]},
+            { type: 'button_group', buttons: [
+              { label: 'View invoice', action: { type: 'navigate', payload: { screen: 'get-paid' } } },
+              { label: 'Send another reminder', action: { type: 'send_message', payload: { text: 'Send reminders for all overdue invoices' } } }
+            ]}
           ]
         };
       }
@@ -327,14 +443,18 @@ window.FinomAI.ChatEngine = (function () {
       case 'cashflow': {
         var cf = toolResults.get_cashflow_forecast || {};
         return {
-          content: 'Cash flow forecast:',
+          content: 'Expected balance in ' + (cf.period || '7 days') + ': ' + (cf.expectedBalance || 'N/A'),
           richContent: [
-            { type: 'text', value: 'Your cash flow forecast for the next ' + (cf.period || '7 days') + ':' },
-            { type: 'card', title: 'Cash Flow Forecast', fields: [
-              { label: 'Payables', value: cf.payables || '' },
-              { label: 'Receivables', value: cf.receivables || '' },
-              { label: 'Expected balance', value: cf.expectedBalance || '' }
-            ] }
+            { type: 'card', title: 'Cash Flow · Next ' + (cf.period || '7 days'), fields: [
+              { label: 'Payables due', value: cf.payables || '' },
+              { label: 'Receivables expected', value: cf.receivables || '' },
+              { label: 'Projected balance', value: cf.expectedBalance || '' }
+            ]},
+            { type: 'button_group', buttons: [
+              { label: '30-day forecast', action: { type: 'send_message', payload: { text: 'Show 30-day cash flow forecast' } } },
+              { label: 'Collect overdue', action: { type: 'send_message', payload: { text: 'Send reminder for overdue invoices' } } },
+              { label: 'View transactions', action: { type: 'navigate', payload: { screen: 'transactions' } } }
+            ]}
           ]
         };
       }
@@ -342,12 +462,17 @@ window.FinomAI.ChatEngine = (function () {
       case 'cards': {
         var cr = toolResults.get_cards || {};
         return {
-          content: 'Your cards:',
+          content: (cr.cards || []).length + ' cards found.',
           richContent: [
-            { type: 'text', value: 'Here are your active cards:' },
+            { type: 'text', value: 'Your active cards:' },
             { type: 'list', items: (cr.cards || []).map(function (c) {
-              return { title: c.type + ' card', subtitle: '~' + c.lastFour, trailing: (c.spent || c.detail || '') };
-            }) }
+              return { title: c.type + ' card', subtitle: '···· ' + c.lastFour, trailing: (c.spent || c.detail || '') };
+            }) },
+            { type: 'button_group', buttons: [
+              { label: 'Save on card fees', action: { type: 'send_message', payload: { text: 'How can I save money on cards?' } } },
+              { label: 'Request new card', action: { type: 'navigate', payload: { screen: 'more' } } },
+              { label: 'Spending breakdown', action: { type: 'send_message', payload: { text: 'Show spending breakdown by category' } } }
+            ]}
           ]
         };
       }
@@ -355,34 +480,65 @@ window.FinomAI.ChatEngine = (function () {
       case 'categories': {
         var cat = toolResults.get_spending_by_category || {};
         return {
-          content: 'Spending breakdown:',
+          content: 'Spending breakdown for ' + (cat.period || 'last 30 days'),
           richContent: [
-            { type: 'text', value: 'Your spending for ' + (cat.period || 'last 30 days') + ':' },
+            { type: 'text', value: 'Spending for ' + (cat.period || 'last 30 days') + ':' },
             { type: 'list', items: (cat.categories || []).map(function (c) {
-              return { title: c.name, subtitle: c.percentage + '%', trailing: c.amount };
-            }) }
+              return { title: c.name, subtitle: c.percentage + '% of total', trailing: c.amount };
+            }) },
+            { type: 'button_group', buttons: [
+              { label: 'Find inefficiencies', action: { type: 'send_message', payload: { text: 'Where am I spending inefficiently?' } } },
+              { label: 'Set spending limit', action: { type: 'navigate', payload: { screen: 'more' } } },
+              { label: 'Export report', action: { type: 'navigate', payload: { screen: 'export' } } }
+            ]}
           ]
         };
       }
 
       case 'chart_budget': {
         return {
-          content: 'Here\u2019s your 2026 budget forecast:',
+          content: '2026 projected expenses: avg. €8,742/mo · total €104,900',
           richContent: [
-            { type: 'text', value: 'Here\u2019s your 2026 expense forecast based on your spending patterns:' },
-            { type: 'image', src: generateBudgetSVG(), alt: '2026 Budget Forecast Chart' },
-            { type: 'markdown', value: 'Your projected 2026 monthly expenses average \u20ac8,742 with a total of \u20ac104,900.\n\u2022 Highest months: July (\u20ac9,400) and December (\u20ac9,600)\n\u2022 Lowest month: May (\u20ac7,500) \u2014 consider reallocating budget\n\u2022 Recommendation: set aside a 10% buffer (~\u20ac10,490) for unexpected costs' }
+            { type: 'text', value: '2026 expense forecast — based on your last 12 months:' },
+            { type: 'image', src: generateBudgetSVG(), alt: '2026 Budget Forecast' },
+            { type: 'markdown', value: 'Avg. €8,742/mo · Total €104,900 projected\n• Peak: Dec (€9,600) and Jul (€9,400)\n• Low: May (€7,500) — opportunity to reallocate\n• Suggested buffer: €10,490 (10%)' },
+            { type: 'button_group', buttons: [
+              { label: 'Adjust forecast', action: { type: 'send_message', payload: { text: 'How do I reduce my monthly expenses?' } } },
+              { label: 'Set monthly limit', action: { type: 'navigate', payload: { screen: 'more' } } },
+              { label: 'Export to PDF', action: { type: 'navigate', payload: { screen: 'export' } } }
+            ]}
           ]
         };
       }
 
       case 'chart_inefficiency': {
         return {
-          content: 'Here\u2019s your spending inefficiency analysis:',
+          content: 'Potential savings: €1,280/month across 6 categories.',
           richContent: [
-            { type: 'text', value: 'I found potential savings across 6 spending categories:' },
-            { type: 'image', src: generateInefficiencySVG(), alt: 'Spending Inefficiency Chart' },
-            { type: 'markdown', value: 'You could save up to \u20ac1,280/month by optimizing these areas.\n\u2022 Subscriptions: \u20ac380/mo \u2014 review unused SaaS tools and licenses\n\u2022 Delivery & Food: \u20ac320/mo \u2014 consolidate orders, consider bulk purchasing\n\u2022 Banking Fees: \u20ac280/mo \u2014 switch to fee-free alternatives for routine transfers' }
+            { type: 'text', value: '6 categories with optimization potential (last 6 mo.):' },
+            { type: 'image', src: generateInefficiencySVG(), alt: 'Spending Inefficiency' },
+            { type: 'markdown', value: 'Total potential savings: €1,280/month\n• Subscriptions €380 — audit unused SaaS licenses\n• Delivery €320 — consolidate orders\n• Bank Fees €280 — switch to fee-free transfers' },
+            { type: 'button_group', buttons: [
+              { label: 'Fix subscriptions', action: { type: 'send_message', payload: { text: 'Show all active subscriptions' } } },
+              { label: 'Reduce bank fees', action: { type: 'send_message', payload: { text: 'How can I save money on cards?' } } },
+              { label: 'Set spending alerts', action: { type: 'navigate', payload: { screen: 'more' } } }
+            ]}
+          ]
+        };
+      }
+
+      case 'chart_cards': {
+        return {
+          content: 'You overpaid €581 in card fees vs. Finom cap over 6 months.',
+          richContent: [
+            { type: 'text', value: 'Card fee comparison — Jan to Jun 2025:' },
+            { type: 'image', src: generateCardsSVG(), alt: 'Card Fees Chart' },
+            { type: 'markdown', value: 'You spent €1,975 in fees — €581 above the Finom cap.\n• Jun spike: €420 (€230 above cap)\n• Switch 2 team cards to Finom Business plan\n• Estimated savings: €116/mo going forward' },
+            { type: 'button_group', buttons: [
+              { label: 'Upgrade plan', action: { type: 'navigate', payload: { screen: 'more' } } },
+              { label: 'Review all cards', action: { type: 'send_message', payload: { text: 'Show all my cards' } } },
+              { label: 'Compare plans', action: { type: 'navigate', payload: { screen: 'more' } } }
+            ]}
           ]
         };
       }
@@ -391,17 +547,21 @@ window.FinomAI.ChatEngine = (function () {
         var ctx = FinomAI.AppContext.get();
         var greeting = ctx.companyName ? 'Hi, ' + ctx.companyName + '!' : 'Hello!';
         return {
-          content: greeting + ' I\u2019m your Finom AI assistant.',
+          content: greeting,
           richContent: [
-            { type: 'text', value: greeting + ' I\u2019m your Finom AI assistant. I can help you with:' },
+            { type: 'text', value: greeting + ' Here\'s what I can help with:' },
             { type: 'list', items: [
-              { title: 'Check your balance', subtitle: 'Account and wallet overview' },
-              { title: 'Review transactions', subtitle: 'Recent activity and filters' },
-              { title: 'Manage invoices', subtitle: 'View, create, send reminders' },
-              { title: 'Cash flow forecast', subtitle: 'Upcoming payables & receivables' },
-              { title: 'Spending analysis', subtitle: 'Breakdown by category' }
-            ] },
-            { type: 'text', value: 'What would you like to know?' }
+              { title: 'Balance & accounts', subtitle: 'Current balance, wallets', trailing: '' },
+              { title: 'Transactions', subtitle: 'Recent activity, categories', trailing: '' },
+              { title: 'Invoices', subtitle: 'View, create, send reminders', trailing: '' },
+              { title: 'Cash flow forecast', subtitle: 'Payables & receivables', trailing: '' },
+              { title: 'Spending analysis', subtitle: 'Breakdown, charts, savings', trailing: '' }
+            ]},
+            { type: 'button_group', buttons: [
+              { label: 'Check balance', action: { type: 'send_message', payload: { text: 'What\'s my balance?' } } },
+              { label: 'Recent transactions', action: { type: 'send_message', payload: { text: 'Show recent transactions' } } },
+              { label: 'Any overdue invoices?', action: { type: 'send_message', payload: { text: 'Show overdue invoices' } } }
+            ]}
           ]
         };
       }
@@ -414,12 +574,9 @@ window.FinomAI.ChatEngine = (function () {
     notify();
   }
 
-  /** Load saved messages silently (no notification per message). */
   function loadMessages(savedMsgs) {
     messages = [];
-    savedMsgs.forEach(function (m) {
-      messages.push(m);
-    });
+    savedMsgs.forEach(function (m) { messages.push(m); });
   }
 
   return {

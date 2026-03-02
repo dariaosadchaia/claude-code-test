@@ -22,6 +22,15 @@ window.FinomAI.MessageRenderer = (function () {
     return name.replace(/_/g, ' ').replace(/\b\w/g, function (l) { return l.toUpperCase(); });
   }
 
+  /* ── Screen name → URL map ─────────────────────────────────── */
+  var screenUrls = {
+    dashboard: 'index.html',
+    transactions: 'transactions.html',
+    invoices: 'get-paid.html',
+    'get-paid': 'get-paid.html',
+    more: 'more.html'
+  };
+
   /* ── Public: render a message object ───────────────────────── */
 
   function render(msg) {
@@ -103,7 +112,8 @@ window.FinomAI.MessageRenderer = (function () {
       case 'card': return renderCard(block);
       case 'list': return renderList(block);
       case 'link': return renderLink(block);
-      case 'action_suggestion': return renderAction(block);
+      case 'action_suggestion': return renderActionLegacy(block);
+      case 'button_group': return renderButtonGroup(block);
       case 'image': return renderImage(block);
       case 'markdown': return renderMarkdown(block);
       default:
@@ -163,7 +173,8 @@ window.FinomAI.MessageRenderer = (function () {
     return a;
   }
 
-  function renderAction(block) {
+  /* Legacy single action button (kept for backward compat) */
+  function renderActionLegacy(block) {
     var btn = el('button', 'rich-action');
     btn.textContent = block.text || '';
     if (block.action) {
@@ -172,6 +183,33 @@ window.FinomAI.MessageRenderer = (function () {
       });
     }
     return btn;
+  }
+
+  /* ── Button group block ────────────────────────────────────── */
+
+  function renderButtonGroup(block) {
+    var group = el('div', 'rich-action-group');
+    (block.buttons || []).forEach(function (btn) {
+      var b = el('button', 'rich-action');
+      b.textContent = btn.label || '';
+      var action = btn.action || {};
+      b.addEventListener('click', function () {
+        if (action.type === 'navigate') {
+          var screen = action.payload && action.payload.screen;
+          var url = screenUrls[screen];
+          if (url) {
+            window.location.href = url;
+          }
+        } else if (action.type === 'send_message') {
+          var msgText = action.payload && action.payload.text;
+          if (msgText) {
+            document.dispatchEvent(new CustomEvent('finom:send_message', { detail: { text: msgText } }));
+          }
+        }
+      });
+      group.appendChild(b);
+    });
+    return group;
   }
 
   /* ── Image block ──────────────────────────────────────────── */

@@ -295,6 +295,15 @@
     });
   });
 
+  /* ── Button group action: send_message ─────────────────────── */
+  document.addEventListener('finom:send_message', function (e) {
+    if (e.detail && e.detail.text) {
+      composer.value = e.detail.text;
+      updateSendState();
+      send();
+    }
+  });
+
   /* ── Auto-scroll ───────────────────────────────────────────── */
   function scrollToBottom() {
     requestAnimationFrame(function () {
