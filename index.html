@@ -469,6 +469,213 @@
       flex-shrink: 0;
     }
     .ai-btn img { width: 26px; height: 29px; }
+
+    /* ═══════════════════════════════════════════
+       CARDS OVERLAY
+       ═══════════════════════════════════════════ */
+
+    /* Root — initially hidden */
+    .co-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      pointer-events: none; opacity: 0;
+      transition: opacity 200ms ease;
+    }
+    .co-overlay.is-open { pointer-events: all; opacity: 1; }
+
+    /* Dimmed backdrop */
+    .co-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(0, 0, 0, 0.45); cursor: pointer;
+    }
+
+    /* Peek card behind the sheet (visible in the gap at top) */
+    .co-peek-card {
+      position: absolute; top: 32px; left: 50%;
+      width: 351px; height: 40px;
+      transform: translateX(-50%) translateY(100%);
+      background: #d8dbdd;
+      border-radius: 20px 20px 0 0;
+      transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 0;
+    }
+    .co-overlay.is-open .co-peek-card { transform: translateX(-50%) translateY(0); }
+
+    /* Sheet (375 px, starts below status bar with rounded top) */
+    .co-sheet {
+      position: absolute; top: 42px; bottom: 0; left: 50%;
+      width: 375px; background: #eef1f2;
+      border-radius: 20px 20px 0 0;
+      display: flex; flex-direction: column;
+      transform: translateX(-50%) translateY(100%);
+      transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden; z-index: 1;
+    }
+    .co-overlay.is-open .co-sheet { transform: translateX(-50%) translateY(0); }
+
+    /* Close-button row */
+    .co-header {
+      background: transparent; height: 44px;
+      display: flex; align-items: center; padding: 0 12px; flex-shrink: 0;
+    }
+    .co-close-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(37, 78, 92, 0.08); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Scrollable body */
+    .co-body {
+      flex: 1; overflow-y: auto; padding: 12px 16px 40px;
+      display: flex; flex-direction: column; gap: 12px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* White section cards */
+    .co-section { background: #fff; border-radius: 20px; overflow: hidden; flex-shrink: 0; }
+
+    /* ── Physical card visual ───────────────── */
+    .co-card-wrap { display: flex; justify-content: center; padding: 16px 16px 0; }
+    .co-card {
+      width: 278px; height: 174px; border-radius: 12px;
+      background: linear-gradient(145deg, #e6e9ea 0%, #d0d5d6 55%, #e2e5e6 100%);
+      box-shadow: 0 26px 14px -20px rgba(0, 0, 0, 0.1);
+      position: relative; overflow: hidden; flex-shrink: 0;
+      border: 1px solid rgba(81, 81, 81, 0.25);
+    }
+    /* Embossed horizontal texture */
+    .co-card::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 7px,
+        rgba(255,255,255,0.14) 7px, rgba(255,255,255,0.14) 8px);
+    }
+    /* Top-left shine */
+    .co-card::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(135deg, rgba(255,255,255,0.28) 0%, transparent 55%);
+    }
+    .co-card__brand {
+      position: absolute; top: 14px; left: 16px; z-index: 1;
+      font-size: 21px; font-weight: 600; font-style: italic;
+      color: #fe42b4; letter-spacing: -0.5px; line-height: 1;
+    }
+    .co-card__label-row {
+      position: absolute; bottom: 44px; left: 16px; z-index: 1;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .co-card__label { font-size: 14px; font-weight: 400; color: #3a3a3a; line-height: 1; }
+    .co-card__bottom {
+      position: absolute; bottom: 14px; left: 16px; right: 16px; z-index: 1;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .co-card__number { font-size: 13px; color: #3a3a3a; letter-spacing: 0.5px; line-height: 1; }
+    .co-card__visa { font-size: 16px; font-style: italic; font-weight: 800; color: #1a1f71; letter-spacing: -1px; }
+
+    /* ── Card quick-action buttons ──────────── */
+    .co-card-actions { display: flex; justify-content: center; padding: 16px 8px 14px; }
+    .co-card-action {
+      flex: 1; max-width: 96px;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      background: none; border: none; cursor: pointer; padding: 0;
+    }
+    .co-card-action__icon {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(37, 78, 92, 0.1);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .co-card-action__label { font-size: 13px; color: #242424; line-height: 18px; }
+
+    /* ── List rows ──────────────────────────── */
+    .co-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 16px; min-height: 54px; cursor: pointer;
+    }
+    .co-row + .co-row { border-top: 1px solid rgba(36, 47, 51, 0.08); }
+
+    .co-icon-block {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: rgba(37, 78, 92, 0.1);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .co-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; object-fit: cover; }
+
+    /* Title as direct flex child (no subtitle) */
+    .co-row > .co-row-title { flex: 1; }
+
+    .co-row-text { flex: 1; display: flex; flex-direction: column; gap: 1px; padding: 8px 0; min-width: 0; }
+    .co-row-title { font-size: 17px; font-weight: 400; color: #242424; line-height: 22px; }
+    .co-row-sub { font-size: 13px; color: rgba(36, 47, 51, 0.64); line-height: 20px; }
+
+    /* ── Limits section ─────────────────────── */
+    .co-limits-header {
+      display: flex; align-items: center; justify-content: space-between; padding: 8px 16px 6px;
+    }
+    .co-section-title { font-size: 17px; font-weight: 600; color: #242424; line-height: 22px; }
+    .co-ai-chip {
+      width: 28px; height: 28px; border-radius: 14px;
+      background: linear-gradient(150deg, rgba(169,142,242,0.28) 12%, rgba(254,66,180,0.28) 78%);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .co-limit-item { padding: 10px 16px 4px; }
+    .co-limit-item + .co-limit-item { padding-top: 6px; }
+    .co-limit-label { display: block; font-size: 13px; color: rgba(36,47,51,0.64); line-height: 20px; margin-bottom: 2px; }
+    .co-limit-value { font-size: 17px; color: #242424; line-height: 22px; margin-bottom: 8px; }
+    .co-limit-total { color: rgba(36, 47, 51, 0.64); }
+    .co-progress {
+      height: 4px; border-radius: 2px;
+      background: rgba(37, 78, 92, 0.12); overflow: hidden; margin-bottom: 10px;
+    }
+    .co-progress__fill { height: 100%; border-radius: 2px; background: #fe42b4; }
+
+    /* ── Card benefits ──────────────────────── */
+    .co-benefits-headline { padding: 8px 16px 4px; }
+    .co-benefits-title { font-size: 17px; font-weight: 600; color: #242424; line-height: 22px; }
+
+    /* Promo upgrade section (gradient, inset) */
+    .co-promo-section {
+      margin: 0 4px 4px;
+      background: linear-gradient(to right, #eef1f2 0%, #fff4fb 100%);
+      border-radius: 16px; overflow: hidden; padding-top: 4px;
+    }
+    .co-promo-section .co-row + .co-row { border-top-color: rgba(36, 47, 51, 0.06); }
+
+    .co-cta-wrap { padding: 6px 12px 12px; }
+    .co-cta-btn {
+      width: 100%; height: 36px; background: #242424; color: #fff;
+      border: none; border-radius: 14px;
+      font-size: 13px; font-weight: 500; font-family: 'Poppins', sans-serif;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .co-cta-btn:active { opacity: 0.85; }
+
+    /* ── AI floating button (cards overlay) ──── */
+    .co-ai-float {
+      position: fixed; right: calc(50% - 375px/2 + 16px); bottom: 40px;
+      z-index: 210;
+      width: 48px; height: 48px; border-radius: 24px;
+      background: linear-gradient(140deg, #a98ef2 0%, #fe42b4 100%);
+      border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(169, 142, 242, 0.35);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+    .co-overlay.is-open .co-ai-float { opacity: 1; pointer-events: all; }
+    .co-ai-float:active { transform: scale(0.95); }
+
+    /* ── Home indicator bar ────────────────────── */
+    .co-home-indicator {
+      flex-shrink: 0; display: flex; justify-content: center;
+      padding: 8px 0 6px; background: #eef1f2;
+    }
+    .co-home-indicator__bar {
+      width: 134px; height: 5px; border-radius: 100px;
+      background: #242424;
+    }
+
+    /* Make dashboard card rows look tappable */
+    .card-row { cursor: pointer; }
+    .card-row:active { background: rgba(37, 78, 92, 0.04); }
   </style>
 </head>
 <body>
@@ -771,6 +978,263 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════
+       CARDS OVERLAY
+       ═══════════════════════════════════════════ -->
+  <div id="cards-overlay" class="co-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="co-limits-title">
+
+    <!-- Backdrop — click to close -->
+    <div class="co-backdrop" id="co-backdrop"></div>
+
+    <!-- Peek card visible behind the sheet -->
+    <div class="co-peek-card"></div>
+
+    <!-- Sheet (starts below status bar, rounded top) -->
+    <div class="co-sheet" id="co-sheet" tabindex="-1">
+
+      <!-- Close row -->
+      <div class="co-header">
+        <button class="co-close-btn" id="co-close-btn" aria-label="Close cards">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1l12 12M13 1L1 13" stroke="#242424" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Scrollable body -->
+      <div class="co-body">
+
+        <!-- ── Physical card + actions ───────────────── -->
+        <div class="co-section">
+          <div class="co-card-wrap">
+            <div class="co-card">
+              <span class="co-card__brand">finom</span>
+              <div class="co-card__label-row">
+                <span class="co-card__label">Physical</span>
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                  <path d="M9.5 2a1.5 1.5 0 012.1 2.1L4.8 10.9 2 11.5l.6-2.8L9.5 2z"
+                        stroke="rgba(36,47,51,0.5)" stroke-width="1.1" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="co-card__bottom">
+                <span class="co-card__number">···· 2290&nbsp;&nbsp;12/27</span>
+                <span class="co-card__visa">VISA</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Details · Freeze · Settings -->
+          <div class="co-card-actions">
+            <button class="co-card-action">
+              <div class="co-card-action__icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M1.5 10C1.5 10 4.5 4 10 4s8.5 6 8.5 6-3 6-8.5 6S1.5 10 1.5 10z"
+                        stroke="#242424" stroke-width="1.3" fill="none"/>
+                  <circle cx="10" cy="10" r="2.5" stroke="#242424" stroke-width="1.3" fill="none"/>
+                </svg>
+              </div>
+              <span class="co-card-action__label">Details</span>
+            </button>
+            <button class="co-card-action">
+              <div class="co-card-action__icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <rect x="3.5" y="9" width="13" height="9" rx="2" stroke="#242424" stroke-width="1.3" fill="none"/>
+                  <path d="M7 9V6.5a3 3 0 016 0V9" stroke="#242424" stroke-width="1.3" stroke-linecap="round"/>
+                  <circle cx="10" cy="13.5" r="1" fill="#242424"/>
+                </svg>
+              </div>
+              <span class="co-card-action__label">Freeze</span>
+            </button>
+            <button class="co-card-action">
+              <div class="co-card-action__icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="6.5" stroke="#242424" stroke-width="1.3" fill="none"/>
+                  <circle cx="10" cy="10" r="2"   stroke="#242424" stroke-width="1.3" fill="none"/>
+                  <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"
+                        stroke="#242424" stroke-width="1.1" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="co-card-action__label">Settings</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ── All transactions ──────────────────────── -->
+        <div class="co-section">
+          <div class="co-row">
+            <div class="co-icon-block">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 4h12M2 7.5h9M2 11h6" stroke="#242424" stroke-width="1.1" stroke-linecap="round"/>
+                <path d="M11.5 8.5v6M9.5 12.5l2 2 2-2" stroke="#242424" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="co-row-title">All transactions</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- ── Cardholder + Linked to Main ──────────── -->
+        <div class="co-section">
+          <div class="co-row">
+            <img class="co-avatar"
+                 src="https://www.figma.com/api/mcp/asset/64c27473-74d2-424d-bde2-2c712af8c75f"
+                 alt="Rosamond Anderson">
+            <div class="co-row-text">
+              <span class="co-row-title">Cardholder</span>
+              <span class="co-row-sub">ROSAMOND ANDERSON</span>
+            </div>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="co-row">
+            <div class="co-icon-block">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M9 7l1-1a2.83 2.83 0 014 4l-2 2a2.83 2.83 0 01-4-4"
+                      stroke="#242424" stroke-width="1.1" stroke-linecap="round"/>
+                <path d="M7 9l-1 1a2.83 2.83 0 01-4-4l2-2a2.83 2.83 0 014 4"
+                      stroke="#242424" stroke-width="1.1" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="co-row-text">
+              <span class="co-row-title">Linked to Main</span>
+              <span class="co-row-sub">5 000,00 €</span>
+            </div>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- ── Limits and controls ───────────────────── -->
+        <div class="co-section">
+          <div class="co-limits-header">
+            <h2 class="co-section-title" id="co-limits-title">Limits and controls</h2>
+            <button class="co-ai-chip" aria-label="Ask AI about limits">
+              <!-- sparkle / stars icon -->
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 2l1.2 3.6 3.8.3-2.9 2.5 1 3.7L8 10l-3.1 2.1 1-3.7L2.9 5.9l3.8-.3L8 2z"
+                      fill="rgba(169,142,242,0.9)" stroke="rgba(169,142,242,0.6)" stroke-width="0.3" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Payment limit -->
+          <div class="co-limit-item">
+            <span class="co-limit-label">Payment limit</span>
+            <div class="co-limit-value">8 000 € <span class="co-limit-total">/ 50 000 €</span></div>
+            <div class="co-progress">
+              <div class="co-progress__fill" style="width:16%"></div>
+            </div>
+          </div>
+
+          <!-- Withdrawal limit (over) -->
+          <div class="co-limit-item">
+            <span class="co-limit-label">Withdrawal limit</span>
+            <div class="co-limit-value">8 000 € <span class="co-limit-total">/ 5 000 €</span></div>
+            <div class="co-progress">
+              <div class="co-progress__fill" style="width:100%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Card benefits ─────────────────────────── -->
+        <div class="co-section">
+          <div class="co-benefits-headline">
+            <h2 class="co-benefits-title">Card benefits</h2>
+          </div>
+
+          <!-- Cashback -->
+          <div class="co-row">
+            <div class="co-icon-block">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="6.5" stroke="#242424" stroke-width="1.1" fill="none"/>
+                <path d="M5.5 10.5l5-5" stroke="#242424" stroke-width="1.1" stroke-linecap="round"/>
+                <circle cx="6" cy="6" r="1" fill="#242424"/>
+                <circle cx="10" cy="10" r="1" fill="#242424"/>
+              </svg>
+            </div>
+            <span class="co-row-title">Cashback</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <!-- Special offers -->
+          <div class="co-row">
+            <div class="co-icon-block">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 1.5l1.6 4.6 4.9.4-3.7 3.2 1.2 4.8L8 12.2l-4 2.3 1.2-4.8-3.7-3.2 4.9-.4L8 1.5z"
+                      stroke="#242424" stroke-width="1.1" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </div>
+            <span class="co-row-title">Special offers</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <!-- Promo rows: Higher limits + Travel perks + CTA -->
+          <div class="co-promo-section">
+            <div class="co-row">
+              <div class="co-icon-block">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <rect x="2.5" y="7.5" width="11" height="7" rx="1.5" stroke="#242424" stroke-width="1.1" fill="none"/>
+                  <path d="M5.5 7.5V5a2.5 2.5 0 015 0v2.5" stroke="#242424" stroke-width="1.1" stroke-linecap="round"/>
+                  <circle cx="8" cy="11" r="1" fill="#242424"/>
+                </svg>
+              </div>
+              <div class="co-row-text">
+                <span class="co-row-title">Higher limits</span>
+                <span class="co-row-sub">Get up to €1K cashback and no FX fees</span>
+              </div>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0">
+                <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="co-row">
+              <div class="co-icon-block">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="6.5" stroke="#242424" stroke-width="1.1" fill="none"/>
+                  <path d="M1.5 8h13M8 1.5C6 1.5 4.5 4.5 4.5 8S6 14.5 8 14.5 11.5 11.5 11.5 8 10 1.5 8 1.5z"
+                        stroke="#242424" stroke-width="1.1" fill="none"/>
+                </svg>
+              </div>
+              <div class="co-row-text">
+                <span class="co-row-title">Travel perks</span>
+                <span class="co-row-sub">Free business lounges, eSIMs and Fast Track</span>
+              </div>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0">
+                <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="co-cta-wrap">
+              <button class="co-cta-btn">Explore Prime benefits</button>
+            </div>
+          </div>
+
+        </div><!-- /co-section benefits -->
+
+      </div><!-- /co-body -->
+
+      <!-- Home indicator -->
+      <div class="co-home-indicator">
+        <div class="co-home-indicator__bar"></div>
+      </div>
+
+    </div><!-- /co-sheet -->
+
+    <!-- AI floating action button -->
+    <button class="co-ai-float" id="co-ai-float" aria-label="Open AI assistant">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="rgba(255,255,255,0.95)"/>
+      </svg>
+    </button>
+
+  </div><!-- /co-overlay -->
+
 </div><!-- /screen -->
 
 <script src="js/app-context.js"></script>
@@ -817,6 +1281,97 @@
   document.querySelector('.ai-btn').addEventListener('click', function () {
     window.location.href = 'ai.html';
   });
+})();
+</script>
+
+<script>
+/* ───────────────────────────────────────────────
+   CARDS OVERLAY — open / close / accessibility
+   ─────────────────────────────────────────────── */
+(function () {
+  var overlay  = document.getElementById('cards-overlay');
+  var sheet    = document.getElementById('co-sheet');
+  var backdrop = document.getElementById('co-backdrop');
+  var closeBtn = document.getElementById('co-close-btn');
+
+  /* Focusable elements inside the sheet */
+  var FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  var lastFocused = null;
+
+  function openCardsOverlay() {
+    lastFocused = document.activeElement;
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    /* Focus the sheet so screen readers announce the dialog */
+    setTimeout(function () { sheet.focus(); }, 50);
+  }
+
+  function closeCardsOverlay() {
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (lastFocused) lastFocused.focus();
+  }
+
+  /* Focus trap */
+  function trapFocus(e) {
+    if (!overlay.classList.contains('is-open')) return;
+    var focusable = Array.prototype.slice.call(sheet.querySelectorAll(FOCUSABLE));
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last  = focusable[focusable.length - 1];
+    if (e.key === 'Tab') {
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+      }
+    }
+  }
+
+  var aiFloat = document.getElementById('co-ai-float');
+  var aiChip  = document.querySelector('.co-ai-chip');
+
+  function initCardsOverlay() {
+    /* Close on backdrop click */
+    backdrop.addEventListener('click', closeCardsOverlay);
+
+    /* Close button */
+    closeBtn.addEventListener('click', closeCardsOverlay);
+
+    /* Close on Escape */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeCardsOverlay();
+      trapFocus(e);
+    });
+
+    /* Open when tapping a card row in the Cards widget */
+    document.querySelectorAll('.card-row').forEach(function (row) {
+      row.setAttribute('role', 'button');
+      row.setAttribute('tabindex', '0');
+      row.addEventListener('click', openCardsOverlay);
+      row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCardsOverlay(); }
+      });
+    });
+
+    /* AI floating button → navigate to AI page */
+    if (aiFloat) {
+      aiFloat.addEventListener('click', function () {
+        window.location.href = 'ai.html';
+      });
+    }
+
+    /* AI chip in Limits section → navigate to AI page */
+    if (aiChip) {
+      aiChip.addEventListener('click', function () {
+        window.location.href = 'ai.html';
+      });
+    }
+  }
+
+  initCardsOverlay();
 })();
 </script>
 </body>
