@@ -104,6 +104,8 @@ window.FinomAI.MessageRenderer = (function () {
       case 'list': return renderList(block);
       case 'link': return renderLink(block);
       case 'action_suggestion': return renderAction(block);
+      case 'image': return renderImage(block);
+      case 'markdown': return renderMarkdown(block);
       default:
         var d = el('div');
         d.textContent = block.value || '';
@@ -170,6 +172,43 @@ window.FinomAI.MessageRenderer = (function () {
       });
     }
     return btn;
+  }
+
+  /* ── Image block ──────────────────────────────────────────── */
+
+  function renderImage(block) {
+    var wrapper = el('div', 'rich-image');
+    var img = document.createElement('img');
+    img.src = block.src || '';
+    img.alt = block.alt || 'Chart';
+    wrapper.appendChild(img);
+    return wrapper;
+  }
+
+  /* ── Markdown block ─────────────────────────────────────────── */
+
+  function renderMarkdown(block) {
+    var wrapper = el('div', 'rich-markdown');
+    var lines = (block.value || '').split('\n');
+    lines.forEach(function (line) {
+      line = line.trim();
+      if (!line) return;
+      if (line.match(/^[\u2022\-\*]\s/)) {
+        var li = el('div', 'rich-markdown__bullet');
+        var dot = el('span', 'rich-markdown__dot');
+        dot.textContent = '\u2022';
+        var txt = el('span', '');
+        txt.textContent = line.replace(/^[\u2022\-\*]\s*/, '');
+        li.appendChild(dot);
+        li.appendChild(txt);
+        wrapper.appendChild(li);
+      } else {
+        var p = el('p', 'rich-markdown__text');
+        p.textContent = line;
+        wrapper.appendChild(p);
+      }
+    });
+    return wrapper;
   }
 
   /* ── Typing indicator ──────────────────────────────────────── */
