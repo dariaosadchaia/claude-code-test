@@ -9,11 +9,24 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #d8dde0;
+      background: #F6F6F6;
       display: flex;
       justify-content: center;
+      align-items: center;
       min-height: 100vh;
       font-family: 'Poppins', sans-serif;
+    }
+
+    .device-frame {
+      width: 375px;
+      height: 812px;
+      border-radius: 32px;
+      border: 2px solid #1a1a1a;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.22), 0 8px 24px rgba(0,0,0,0.12);
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+      transform: translateZ(0);
     }
 
     .screen {
@@ -22,6 +35,12 @@
       min-height: 100vh;
       position: relative;
       overflow-x: hidden;
+    }
+
+    .device-frame .screen {
+      min-height: unset;
+      height: 812px;
+      overflow-y: auto;
     }
 
     /* ── Status bar ───────────────────────────────────────────── */
@@ -413,6 +432,7 @@
   </style>
 </head>
 <body>
+<div class="device-frame">
 <div class="screen">
 
   <!-- STATUS BAR -->
@@ -529,7 +549,7 @@
           <div class="planned-row__sub">To pay today</div>
         </div>
         <div class="planned-row__right">
-          <span class="planned-row__amount">&minus; 2 787,00 &euro;</span>
+          <span class="planned-row__amount">&minus; 1 245,00 &euro;</span>
         </div>
       </div>
       <div class="planned-row">
@@ -557,16 +577,17 @@
       <div class="tx-row">
         <div class="tx-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M7 17L17 7M17 7H10M17 7v7" stroke="#242424" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="2" y="5" width="20" height="14" rx="2.5" stroke="#242424" stroke-width="1.4" fill="none"/>
+            <path d="M2 9.5h20" stroke="#242424" stroke-width="1.4"/>
+            <rect x="5" y="13" width="5" height="2.5" rx="0.8" fill="#242424" opacity="0.6"/>
           </svg>
         </div>
         <div class="tx-info">
           <div class="tx-name">Boulanger S.A.S.</div>
-          <div class="tx-tag">#tag</div>
         </div>
         <div class="tx-right">
-          <div class="tx-amount">&minus; 2 787,00 &euro;</div>
-          <div class="tx-date">20 Jan</div>
+          <div class="tx-amount">&minus; 1 245,00 &euro;</div>
+          <div class="tx-date">19 Jul</div>
         </div>
       </div>
       <div class="tx-row">
@@ -580,8 +601,8 @@
           <div class="tx-tag">#electronic</div>
         </div>
         <div class="tx-right">
-          <div class="tx-amount">&minus; 2 787,00 $</div>
-          <div class="tx-date">20 Jan</div>
+          <div class="tx-amount">&minus; 439,50 $</div>
+          <div class="tx-date">19 Jul</div>
         </div>
       </div>
       <div class="tx-row">
@@ -595,8 +616,8 @@
           <div class="tx-tag">#electronic</div>
         </div>
         <div class="tx-right">
-          <div class="tx-amount tx-amount--positive">+ 2 787,00 &euro;</div>
-          <div class="tx-date">20 Jan</div>
+          <div class="tx-amount tx-amount--positive">+ 3 150,00 &euro;</div>
+          <div class="tx-date">19 Jul</div>
         </div>
       </div>
     </div>
@@ -615,8 +636,8 @@
           <div class="tx-tag">#tag</div>
         </div>
         <div class="tx-right">
-          <div class="tx-amount">&minus; 2 787,00 &euro;</div>
-          <div class="tx-date">20 Jan</div>
+          <div class="tx-amount">&minus; 892,30 &euro;</div>
+          <div class="tx-date">18 Jul</div>
         </div>
       </div>
       <div class="tx-row">
@@ -630,8 +651,8 @@
           <div class="tx-tag">#tag</div>
         </div>
         <div class="tx-right">
-          <div class="tx-amount">&minus; 2 787,00 &euro;</div>
-          <div class="tx-date">20 Jan</div>
+          <div class="tx-amount">&minus; 5 420,00 &euro;</div>
+          <div class="tx-date">18 Jul</div>
         </div>
       </div>
       <div class="tx-row">
@@ -645,8 +666,8 @@
           <div class="tx-tag">#electronic</div>
         </div>
         <div class="tx-right">
-          <div class="tx-amount tx-amount--positive">+ 2 787,00 &euro;</div>
-          <div class="tx-date">20 Jan</div>
+          <div class="tx-amount tx-amount--positive">+ 12 500,00 &euro;</div>
+          <div class="tx-date">18 Jul</div>
         </div>
       </div>
     </div>
@@ -665,8 +686,8 @@
           <div class="tx-tag tx-tag--green">&bull; Invoice 47/05-2020</div>
         </div>
         <div class="tx-right">
-          <div class="tx-amount tx-amount--positive">+ 2 787,00 &euro;</div>
-          <div class="tx-date">20 Jan</div>
+          <div class="tx-amount tx-amount--positive">+ 8 340,00 &euro;</div>
+          <div class="tx-date">12 Jul</div>
         </div>
       </div>
       <div class="tx-row">
@@ -680,8 +701,8 @@
           <div class="tx-tag">#electronic</div>
         </div>
         <div class="tx-right">
-          <div class="tx-amount tx-amount--positive">+ 2 787,00 &euro;</div>
-          <div class="tx-date">20 Jan</div>
+          <div class="tx-amount tx-amount--positive">+ 2 175,50 &euro;</div>
+          <div class="tx-date">8 Jul</div>
         </div>
       </div>
     </div>
@@ -700,8 +721,8 @@
           <div class="tx-tag tx-tag--green">&bull; Invoice 47/05-2020</div>
         </div>
         <div class="tx-right">
-          <div class="tx-amount tx-amount--positive">+ 2 787,00 &euro;</div>
-          <div class="tx-date">20 Jan</div>
+          <div class="tx-amount tx-amount--positive">+ 4 620,00 &euro;</div>
+          <div class="tx-date">28 Jun</div>
         </div>
       </div>
       <div class="tx-row">
@@ -715,8 +736,8 @@
           <div class="tx-tag">#electronic</div>
         </div>
         <div class="tx-right">
-          <div class="tx-amount tx-amount--positive">+ 2 787,00 &euro;</div>
-          <div class="tx-date">20 Jan</div>
+          <div class="tx-amount tx-amount--positive">+ 760,00 &euro;</div>
+          <div class="tx-date">21 Jun</div>
         </div>
       </div>
     </div>
@@ -775,7 +796,8 @@
     </div>
   </div>
 
-</div>
+</div><!-- /screen -->
+</div><!-- /device-frame -->
 
 <script src="js/app-context.js"></script>
 <script>

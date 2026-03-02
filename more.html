@@ -9,11 +9,24 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #d8dde0;
+      background: #F6F6F6;
       display: flex;
       justify-content: center;
+      align-items: center;
       min-height: 100vh;
       font-family: 'Poppins', sans-serif;
+    }
+
+    .device-frame {
+      width: 375px;
+      height: 812px;
+      border-radius: 32px;
+      border: 2px solid #1a1a1a;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.22), 0 8px 24px rgba(0,0,0,0.12);
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+      transform: translateZ(0);
     }
 
     .screen {
@@ -22,6 +35,12 @@
       min-height: 100vh;
       position: relative;
       overflow-x: hidden;
+    }
+
+    .device-frame .screen {
+      min-height: unset;
+      height: 812px;
+      overflow-y: auto;
     }
 
     /* ── Status bar ───────────────────────────────────────────── */
@@ -338,6 +357,7 @@
   </style>
 </head>
 <body>
+<div class="device-frame">
 <div class="screen">
 
   <!-- STATUS BAR -->
@@ -864,7 +884,8 @@
     </div>
   </div>
 
-</div>
+</div><!-- /screen -->
+</div><!-- /device-frame -->
 
 <script src="js/app-context.js"></script>
 <script>
