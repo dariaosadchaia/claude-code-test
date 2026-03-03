@@ -970,9 +970,26 @@
       </div>
     </div>
 
-    <!-- TODAY, 19 JULY -->
+    <!-- TODAY -->
     <div class="date-label">Today, 19 July</div>
     <div class="card">
+      <div class="tx-row">
+        <div class="tx-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="5" width="20" height="14" rx="2.5" stroke="#242424" stroke-width="1.4" fill="none"/>
+            <path d="M2 9.5h20" stroke="#242424" stroke-width="1.4"/>
+            <rect x="5" y="13" width="5" height="2.5" rx="0.8" fill="#242424" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="tx-info">
+          <div class="tx-name">Larnaca Airport Business Lounge</div>
+          <div class="tx-tag">Travel</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount">&minus; 30,00 &euro;</div>
+          <div class="tx-date">19 Jul</div>
+        </div>
+      </div>
       <div class="tx-row">
         <div class="tx-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -1395,7 +1412,7 @@
 
   /* Day-offsets per group; each sub-array = offsets for the tx-rows inside that card */
   var groupOffsets = [
-    [0, 0, 0],      /* Today          */
+    [0, 0, 0, 0],   /* Today          */
     [-1, -1, -1],   /* Yesterday      */
     [-7, -11],       /* Earlier / prev */
     [-24, -31]       /* Older month    */

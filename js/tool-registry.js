@@ -59,6 +59,7 @@ FinomAI.ToolRegistry.register('list_transactions', {
   parameters: { type: 'object', properties: { filter: { type: 'string' }, limit: { type: 'number' } } },
   handler: function (params, ctx) {
     var txs = ctx.transactions && ctx.transactions.length ? ctx.transactions : [
+      { name: 'Larnaca Airport Business Lounge', category: 'Travel', amount: '\u2013 30,00 \u20ac', date: 'Today', status: 'Completed' },
       { name: 'Spotify AB', category: 'Subscriptions', amount: '\u2013 14,99 \u20ac', date: 'Today', status: 'Completed' },
       { name: 'AWS Services', category: 'Software', amount: '\u2013 248,00 \u20ac', date: 'Today', status: 'Completed' },
       { name: 'Martin Schmidt', category: 'Invoice #1042', amount: '+ 3 200,00 \u20ac', date: 'Yesterday', status: 'Completed' },
