@@ -1370,6 +1370,60 @@
 </div><!-- /device-frame -->
 
 <script src="js/app-context.js"></script>
+
+<script>
+/* ── Dynamic dates — all dates shift relative to today ───── */
+(function () {
+  function startOfDay(d) { var r = new Date(d); r.setHours(0, 0, 0, 0); return r; }
+  function addDays(d, delta) { var r = new Date(d); r.setDate(r.getDate() + delta); return r; }
+
+  var today    = startOfDay(new Date());
+  var locale   = 'en-GB';
+  var shortFmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' });
+  var longFmt  = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long' });
+  var monthFmt = new Intl.DateTimeFormat(locale, { month: 'long' });
+
+  function formatGroupLabel(date) {
+    var d    = startOfDay(date);
+    var diff = Math.round((today - d) / 86400000);
+    if (diff === 0) return 'Today, ' + longFmt.format(d);
+    if (diff === 1) return 'Yesterday';
+    if (d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear())
+      return 'Earlier this month';
+    return monthFmt.format(d);
+  }
+
+  /* Day-offsets per group; each sub-array = offsets for the tx-rows inside that card */
+  var groupOffsets = [
+    [0, 0, 0],      /* Today          */
+    [-1, -1, -1],   /* Yesterday      */
+    [-7, -11],       /* Earlier / prev */
+    [-24, -31]       /* Older month    */
+  ];
+
+  var dateLabels = document.querySelectorAll('.content > .date-label');
+
+  dateLabels.forEach(function (label, i) {
+    if (i >= groupOffsets.length) return;
+    var offsets = groupOffsets[i];
+
+    /* Update group heading */
+    label.textContent = formatGroupLabel(addDays(today, offsets[0]));
+
+    /* Find the .card that follows this label */
+    var card = label.nextElementSibling;
+    while (card && !card.classList.contains('card')) card = card.nextElementSibling;
+    if (!card) return;
+
+    /* Update each .tx-date inside the card */
+    var txDates = card.querySelectorAll('.tx-date');
+    offsets.forEach(function (offset, j) {
+      if (j < txDates.length) txDates[j].textContent = shortFmt.format(addDays(today, offset));
+    });
+  });
+})();
+</script>
+
 <script>
 (function () {
   var ctx = { currentScreen: 'transactions' };

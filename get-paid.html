@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0">
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
   <title>Finom – Get Paid</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -670,6 +671,63 @@
 </div><!-- /device-frame -->
 
 <script src="js/app-context.js"></script>
+
+<script>
+/* ── Dynamic dates — all dates shift relative to today ───── */
+(function () {
+  function startOfDay(d) { var r = new Date(d); r.setHours(0, 0, 0, 0); return r; }
+
+  var today    = startOfDay(new Date());
+  var locale   = 'en-GB';
+  var shortFmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' });
+  var monthFmt = new Intl.DateTimeFormat(locale, { month: 'long' });
+  var shortMonthFmt = new Intl.DateTimeFormat(locale, { month: 'short' });
+
+  var dom = today.getDate();
+  var yr  = today.getFullYear();
+  var mo  = today.getMonth();
+
+  /* Group 1: current month — spread from today backward, clamped to 1st */
+  var g1Days = [dom, Math.max(dom - 1, 1), Math.max(dom - 3, 1),
+                Math.max(dom - 3, 1), Math.max(dom - 3, 1), Math.max(dom - 3, 1)];
+  var g1Dates = g1Days.map(function (d) { return new Date(yr, mo, d); });
+
+  /* Group 2: previous month — fixed days, clamped to month length */
+  var prevLastDay = new Date(yr, mo, 0).getDate();
+  var g2Days = [Math.min(25, prevLastDay), Math.min(18, prevLastDay), Math.min(16, prevLastDay)];
+  var g2Dates = g2Days.map(function (d) { return new Date(yr, mo - 1, d); });
+
+  var groups = [
+    { dates: g1Dates },
+    { dates: g2Dates }
+  ];
+
+  /* Update group labels */
+  var headers = document.querySelectorAll('.date-header__label');
+  headers.forEach(function (h, i) {
+    if (i < groups.length) h.textContent = monthFmt.format(groups[i].dates[0]);
+  });
+
+  /* Update invoice dates within each group's card */
+  var cards = document.querySelectorAll('.inv-card');
+  cards.forEach(function (card, i) {
+    if (i >= groups.length) return;
+    var dateCells = card.querySelectorAll('.inv-row__date');
+    groups[i].dates.forEach(function (date, j) {
+      if (j < dateCells.length) dateCells[j].textContent = shortFmt.format(date);
+    });
+  });
+
+  /* Update "Paid in {month}" summary label */
+  var summaryLabels = document.querySelectorAll('.summary-card__label');
+  summaryLabels.forEach(function (el) {
+    if (/^Paid in/i.test(el.textContent)) {
+      el.textContent = 'Paid in ' + shortMonthFmt.format(new Date(yr, mo - 1, 1));
+    }
+  });
+})();
+</script>
+
 <script>
 (function () {
   var ctx = { currentScreen: 'get-paid' };
