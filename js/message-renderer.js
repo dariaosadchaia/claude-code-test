@@ -28,8 +28,7 @@ window.FinomAI.MessageRenderer = (function () {
     transactions: 'transactions.html',
     invoices: 'get-paid.html',
     'get-paid': 'get-paid.html',
-    more: 'more.html',
-    card: 'card.html'
+    more: 'more.html'
   };
 
   /* ── Public: render a message object ───────────────────────── */
@@ -199,9 +198,13 @@ window.FinomAI.MessageRenderer = (function () {
       b.addEventListener('click', function () {
         if (action.type === 'navigate') {
           var screen = action.payload && action.payload.screen;
-          var url = screenUrls[screen];
-          if (url) {
-            window.location.href = url;
+          if (screen === 'card') {
+            document.dispatchEvent(new CustomEvent('finom:open_card_overlay'));
+          } else {
+            var url = screenUrls[screen];
+            if (url) {
+              window.location.href = url;
+            }
           }
         } else if (action.type === 'send_message') {
           var msgText = action.payload && action.payload.text;

@@ -161,6 +161,8 @@
       else older.push(s);
     });
 
+    var unreadChatId = sessionStorage.getItem('finom_prime_unread_chat_id');
+
     function renderGroup(items) {
       items.forEach(function (s) {
         var item = document.createElement('div');
@@ -168,15 +170,16 @@
         item.setAttribute('data-chat-id', s.id);
 
         var isActive = s.id === activeChatId;
+        var isUnread = s.id === unreadChatId;
         var dateStr = FinomAI.ChatHistory.formatDate(s.createdAt);
 
         item.innerHTML =
           '<div class="history-item__info">' +
-            '<span class="history-item__name' + (isActive ? ' history-item__name--active' : '') + '">' + escapeHtml(s.title) + '</span>' +
+            '<span class="history-item__name' + ((isActive || isUnread) ? ' history-item__name--active' : '') + '">' + escapeHtml(s.title) + '</span>' +
             '<span class="history-item__tag">' + dateStr + '</span>' +
           '</div>' +
           '<div class="history-item__right">' +
-            (isActive ? '<div class="history-item__badge"></div>' : '') +
+            ((isActive || isUnread) ? '<div class="history-item__badge"></div>' : '') +
             '<div class="history-item__more">' +
               '<svg width="24" height="24" viewBox="0 0 24 24" fill="none">' +
                 '<circle cx="5.5" cy="12" r="1.5" fill="#242424"/>' +
@@ -226,6 +229,7 @@
     saveCurrentChat();
     renderHistoryList();
     historyOverlay.classList.add('is-visible');
+    clearUnreadState();
   }
 
   function hideHistory() {
@@ -402,10 +406,15 @@
   }
 
   /* ── Initialize: create first chat session ─────────────────── */
+  var unreadPrimeChatId = sessionStorage.getItem('finom_prime_unread_chat_id');
   var existingActiveId = FinomAI.ChatHistory.getActiveId();
   var existingSession = existingActiveId ? FinomAI.ChatHistory.getById(existingActiveId) : null;
 
-  if (existingSession && existingSession.messages && existingSession.messages.length > 0) {
+  /* If the active session IS the unread prime chat, don't auto-load it;
+     start a fresh welcome screen instead so the user discovers it via history. */
+  var skipRestore = unreadPrimeChatId && existingActiveId === unreadPrimeChatId;
+
+  if (!skipRestore && existingSession && existingSession.messages && existingSession.messages.length > 0) {
     // Restore the active session
     activeChatId = existingSession.id;
     loadChat(activeChatId);
@@ -413,6 +422,14 @@
     // Start fresh
     var session = FinomAI.ChatHistory.create();
     activeChatId = session.id;
+  }
+
+  /* ── Check for unread prime chat → show history badge ──────── */
+  if (unreadPrimeChatId) {
+    var unreadSession = FinomAI.ChatHistory.getById(unreadPrimeChatId);
+    if (unreadSession && unreadSession.messages && unreadSession.messages.length > 0) {
+      showHistoryBadge('1');
+    }
   }
 
   /* ── Update context for this screen (after reading previous) ─ */

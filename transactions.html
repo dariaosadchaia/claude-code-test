@@ -813,10 +813,31 @@
       display: flex; align-items: center; justify-content: center;
       opacity: 0; pointer-events: none;
       transition: opacity 200ms ease;
+      /* badge needs positioning context — fixed already works */
     }
     .td-ai-float img { width: 26px; height: 29px; }
     .td-overlay.is-open .td-ai-float { opacity: 1; pointer-events: all; }
     .td-ai-float:active { transform: scale(0.95); }
+
+    /* ── AI float badge (unread notification) ── */
+    .td-ai-float__badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      background: #fe42b4;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+      line-height: 1;
+      pointer-events: none;
+    }
 
     /* ── Home indicator ────────────────────── */
     .td-home-indicator {
@@ -1387,6 +1408,7 @@
 </div><!-- /device-frame -->
 
 <script src="js/app-context.js"></script>
+<script src="js/chat-history.js"></script>
 
 <script>
 /* ── Dynamic dates — all dates shift relative to today ───── */
@@ -1545,6 +1567,8 @@
   }
 
   /* ── Open overlay ───────────────────────── */
+  var primeTriggered = sessionStorage.getItem('finom_prime_triggered');
+
   function openTxDetails(txRow) {
     var data = extractTxData(txRow);
     populateDetails(data);
@@ -1559,6 +1583,57 @@
       sheet.focus({ preventScroll: true });
       screen.scrollTop = pos;
     }, 50);
+
+    /* ── Prime upgrade trigger: Larnaca Airport tx ── */
+    if (!primeTriggered && data.name && data.name.indexOf('Larnaca Airport') !== -1) {
+      primeTriggered = true;
+      sessionStorage.setItem('finom_prime_triggered', 'true');
+
+      /* Create proactive prime chat in history */
+      var primeSession = FinomAI.ChatHistory.create();
+      primeSession.title = 'Prime upgrade';
+      var primeMsg = {
+        id: 'msg_prime_' + Math.random().toString(36).substr(2, 9),
+        timestamp: Date.now(),
+        role: 'assistant',
+        content: 'Based on your recent transaction at Larnaca Airport Business Lounge on your \u00b7\u00b7\u00b7\u00b7 4520 card, you may benefit from our Prime plan.',
+        richContent: [
+          { type: 'text', value: 'Based on your recent transaction at Larnaca Airport Business Lounge on your \u00b7\u00b7\u00b7\u00b7 4520 card, you may benefit from our Prime plan.' },
+          { type: 'transaction_tile' },
+          { type: 'prime_buttons', buttons: [
+            { label: 'Upgrade to Prime', style: 'primary', action: 'upgrade_prime' },
+            { label: 'Learn more about Prime', style: 'secondary', action: 'learn_prime' }
+          ]}
+        ]
+      };
+      primeSession.messages = [primeMsg];
+      FinomAI.ChatHistory.updateMessages(primeSession.id, primeSession.messages);
+
+      /* Force-set title (updateMessages only titles from first user msg) */
+      (function () {
+        try {
+          var KEY = 'finom_ai_chat_history';
+          var all = JSON.parse(localStorage.getItem(KEY)) || [];
+          for (var k = 0; k < all.length; k++) {
+            if (all[k].id === primeSession.id) { all[k].title = 'Prime upgrade'; break; }
+          }
+          localStorage.setItem(KEY, JSON.stringify(all));
+        } catch (e) {}
+      })();
+
+      /* Store unread chat ID so ai.html can show badge */
+      sessionStorage.setItem('finom_prime_unread_chat_id', primeSession.id);
+
+      /* Show badge on AI float button after a brief delay */
+      setTimeout(function () {
+        if (aiFloat && !aiFloat.querySelector('.td-ai-float__badge')) {
+          var badge = document.createElement('span');
+          badge.className = 'td-ai-float__badge';
+          badge.textContent = '1';
+          aiFloat.appendChild(badge);
+        }
+      }, 600);
+    }
   }
 
   /* ── Close overlay ──────────────────────── */
