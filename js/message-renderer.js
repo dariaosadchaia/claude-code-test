@@ -28,7 +28,8 @@ window.FinomAI.MessageRenderer = (function () {
     transactions: 'transactions.html',
     invoices: 'get-paid.html',
     'get-paid': 'get-paid.html',
-    more: 'more.html'
+    more: 'more.html',
+    card: 'card.html'
   };
 
   /* ── Public: render a message object ───────────────────────── */
@@ -116,6 +117,8 @@ window.FinomAI.MessageRenderer = (function () {
       case 'button_group': return renderButtonGroup(block);
       case 'image': return renderImage(block);
       case 'markdown': return renderMarkdown(block);
+      case 'transaction_tile': return renderTransactionTile(block);
+      case 'prime_buttons': return renderPrimeButtons(block);
       default:
         var d = el('div');
         d.textContent = block.value || '';
@@ -247,6 +250,65 @@ window.FinomAI.MessageRenderer = (function () {
       }
     });
     return wrapper;
+  }
+
+  /* ── Transaction tile block ────────────────────────────────── */
+
+  function renderTransactionTile(block) {
+    var tile = el('div', 'rich-tx-tile');
+    tile.style.cssText = 'background:#fff;border:1px solid rgba(37,78,92,0.12);border-radius:20px;padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer;margin:8px 0;transition:background 0.15s;';
+
+    // Card icon
+    var iconWrap = el('div', '');
+    iconWrap.style.cssText = 'width:20px;height:20px;flex-shrink:0;';
+    iconWrap.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="1.5" y="4" width="17" height="12" rx="2" stroke="#242424" stroke-width="1.2" fill="none"/><path d="M1.5 8h17" stroke="#242424" stroke-width="1.2"/><rect x="4" y="11" width="4" height="2" rx="0.6" fill="#242424" opacity="0.5"/></svg>';
+    tile.appendChild(iconWrap);
+
+    // "Transaction" text
+    var label = el('span', '');
+    label.textContent = 'Transaction';
+    label.style.cssText = 'flex:1;font-size:15px;font-weight:500;color:#242424;';
+    tile.appendChild(label);
+
+    // Link-out icon
+    var linkIcon = el('div', '');
+    linkIcon.style.cssText = 'width:20px;height:20px;flex-shrink:0;';
+    linkIcon.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M8 4h8v8M16 4L7 13" stroke="#242424" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    tile.appendChild(linkIcon);
+
+    tile.addEventListener('click', function () {
+      window.location.href = 'transactions.html';
+    });
+    return tile;
+  }
+
+  /* ── Prime CTA buttons block ─────────────────────────────── */
+
+  function renderPrimeButtons(block) {
+    var group = el('div', 'rich-prime-buttons');
+    group.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px;';
+
+    (block.buttons || []).forEach(function (btn) {
+      var b = el('button', '');
+      b.textContent = btn.label || '';
+      b.style.cssText = 'height:40px;padding:0 24px;border-radius:20px;font-family:Poppins,sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:opacity 0.15s;border:none;';
+
+      if (btn.style === 'primary') {
+        b.style.background = '#242424';
+        b.style.color = '#fff';
+      } else {
+        b.style.background = 'transparent';
+        b.style.border = '1px solid rgba(26,45,51,0.32)';
+        b.style.color = '#242424';
+      }
+
+      var action = btn.action;
+      b.addEventListener('click', function () {
+        document.dispatchEvent(new CustomEvent('finom:prime_action', { detail: { action: action } }));
+      });
+      group.appendChild(b);
+    });
+    return group;
   }
 
   /* ── Typing indicator ──────────────────────────────────────── */

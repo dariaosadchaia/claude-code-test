@@ -22,6 +22,29 @@
   var hasMessages = false;
   var activeChatId = null;
 
+  /* ── History badge helpers ─────────────────────────────────── */
+  function showHistoryBadge(count) {
+    var existing = document.getElementById('history-badge');
+    if (existing) existing.remove();
+    if (!count) return;
+    var badge = document.createElement('span');
+    badge.id = 'history-badge';
+    badge.className = 'chat-menu-badge';
+    badge.textContent = count;
+    historyBtn.style.position = 'relative';
+    historyBtn.appendChild(badge);
+  }
+
+  function hideHistoryBadge() {
+    var b = document.getElementById('history-badge');
+    if (b) b.remove();
+  }
+
+  function clearUnreadState() {
+    sessionStorage.removeItem('finom_prime_unread_chat_id');
+    hideHistoryBadge();
+  }
+
   /* ── Save previous screen before overwriting ───────────────── */
   var ctx = FinomAI.AppContext.get();
   var previousScreen = ctx.currentScreen;
@@ -301,6 +324,60 @@
       composer.value = e.detail.text;
       updateSendState();
       send();
+    }
+  });
+
+  /* ── Prime CTA action handlers ───────────────────────────── */
+  document.addEventListener('finom:prime_action', function (e) {
+    if (!e.detail || !e.detail.action) return;
+    var action = e.detail.action;
+
+    if (action === 'learn_prime') {
+      // Add user message
+      FinomAI.ChatEngine.addMessage({ role: 'user', content: 'Learn more about Prime' });
+      // Show typing
+      chatArea.appendChild(FinomAI.MessageRenderer.renderTypingIndicator());
+      scrollToBottom();
+      // After delay, add assistant response
+      setTimeout(function () {
+        var typing = document.getElementById('typing-indicator');
+        if (typing) typing.remove();
+        FinomAI.ChatEngine.addMessage({
+          role: 'assistant',
+          content: 'Here\u2019s what Prime includes:',
+          richContent: [
+            { type: 'text', value: 'Here\u2019s what Prime includes:' },
+            { type: 'markdown', value: '\u2022 1% cashback on all card payments, with a monthly cap of \u20ac1,000 per company\n\u2022 Zero foreign exchange fees on non-EUR transactions up to \u20ac20,000 per month\n\u2022 Two complimentary business lounge visits per quarter\n\u2022 Monthly eSIM data package (1 GB)' },
+            { type: 'prime_buttons', buttons: [
+              { label: 'Upgrade to Prime', style: 'primary', action: 'upgrade_prime' }
+            ]}
+          ]
+        });
+      }, 900);
+    }
+
+    if (action === 'upgrade_prime') {
+      // Add user message
+      FinomAI.ChatEngine.addMessage({ role: 'user', content: 'Upgrade to Prime' });
+      // Show typing
+      chatArea.appendChild(FinomAI.MessageRenderer.renderTypingIndicator());
+      scrollToBottom();
+      // After delay, add confirmation
+      setTimeout(function () {
+        var typing = document.getElementById('typing-indicator');
+        if (typing) typing.remove();
+        FinomAI.ChatEngine.addMessage({
+          role: 'assistant',
+          content: 'Done \u2014 your card has been upgraded to Prime.',
+          richContent: [
+            { type: 'text', value: 'Done \u2014 your card has been upgraded to Prime. Enjoy your traveller benefits starting today.' },
+            { type: 'button_group', buttons: [
+              { label: 'View your Prime card', action: { type: 'navigate', payload: { screen: 'card' } } }
+            ]}
+          ]
+        });
+        sessionStorage.setItem('finom_prime_upgraded', 'true');
+      }, 900);
     }
   });
 
