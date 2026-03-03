@@ -440,6 +440,371 @@
       view-transition-name: ai-btn;
     }
     .ai-btn img { width: 26px; height: 29px; }
+
+    /* ═══════════════════════════════════════════════════════
+       TRANSACTION DETAILS OVERLAY
+       ═══════════════════════════════════════════════════════ */
+
+    /* Root — positioning context */
+    .td-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      pointer-events: none;
+    }
+    .td-overlay.is-open { pointer-events: all; }
+
+    /* Dimmed backdrop — opacity only, no transform */
+    .td-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .td-overlay.is-open .td-backdrop { opacity: 1; }
+
+    /* Peek card behind the sheet */
+    .td-peek-card {
+      position: fixed; top: 32px; left: 50%;
+      width: 351px; height: 40px;
+      background: #d8dbdd;
+      border-radius: 20px 20px 0 0;
+      z-index: 201;
+      will-change: transform;
+      backface-visibility: hidden;
+      transform: translateX(-50%) translate3d(0, 100vh, 0);
+      transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .td-overlay.is-open .td-peek-card {
+      transform: translateX(-50%) translate3d(0, 0, 0);
+    }
+
+    /* Sheet — single surface slide up */
+    .td-sheet {
+      position: fixed; top: 42px; bottom: 0; left: 50%;
+      width: 375px; background: #eef1f2;
+      border-radius: 20px 20px 0 0;
+      display: flex; flex-direction: column;
+      overflow: hidden; z-index: 202;
+      will-change: transform;
+      backface-visibility: hidden;
+      transform: translateX(-50%) translate3d(0, 100vh, 0);
+      transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .td-overlay.is-open .td-sheet {
+      transform: translateX(-50%) translate3d(0, 0, 0);
+    }
+
+    /* ── Close button header ────────────────── */
+    .td-header {
+      display: flex; align-items: center;
+      padding: 6px 12px;
+      height: 44px;
+      flex-shrink: 0;
+    }
+    .td-close-btn {
+      width: 32px; height: 32px;
+      border-radius: 1000px;
+      background: rgba(37, 78, 92, 0.12);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0;
+    }
+    .td-close-btn:active { opacity: 0.7; }
+    .td-close-btn svg { width: 16px; height: 16px; }
+
+    /* ── Scrollable content ─────────────────── */
+    .td-scroll {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .td-content {
+      padding: 0 16px 40px;
+      display: flex; flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── Header card (amount, recipient) ─────── */
+    .td-hero {
+      background: #fff;
+      border-radius: 20px;
+      padding: 16px;
+      display: flex; flex-direction: column;
+      align-items: center;
+    }
+    .td-status-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding-bottom: 24px;
+    }
+    .td-status-text, .td-status-date {
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(36, 47, 51, 0.64);
+      line-height: 16px;
+    }
+    .td-recipient {
+      font-size: 13px;
+      font-weight: 600;
+      color: #242424;
+      line-height: 17px;
+      letter-spacing: 0.26px;
+      text-align: center;
+      padding-bottom: 16px;
+      width: 100%;
+    }
+    .td-amount-big {
+      font-size: 32px;
+      font-weight: 600;
+      color: #242424;
+      line-height: 36px;
+      text-align: center;
+      padding-bottom: 8px;
+    }
+    .td-fee {
+      padding-bottom: 24px;
+      display: flex; justify-content: center;
+    }
+    .td-fee-pill {
+      background: rgba(37, 78, 92, 0.08);
+      border-radius: 8px;
+      padding: 0 8px 0 8px;
+      display: flex; align-items: center;
+    }
+    .td-fee-text {
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(36, 47, 51, 0.64);
+      line-height: 20px;
+      padding-right: 4px;
+    }
+    .td-download-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 8px;
+    }
+    .td-download-btn {
+      width: 44px; height: 44px;
+      border-radius: 22px;
+      background: rgba(37, 78, 92, 0.12);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0;
+    }
+    .td-download-btn:active { opacity: 0.7; }
+    .td-download-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: #242424;
+      line-height: 16px;
+      text-align: center;
+    }
+
+    /* ── Tags widget ────────────────────────── */
+    .td-widget {
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      padding: 8px 0;
+    }
+    .td-widget-headline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 16px;
+      min-height: 28px;
+    }
+    .td-widget-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #242424;
+      line-height: 22px;
+    }
+    .td-widget-action {
+      font-size: 13px;
+      font-weight: 500;
+      color: #4a74ff;
+      line-height: 13px;
+      background: none; border: none; cursor: pointer;
+      padding: 0; font-family: 'Poppins', sans-serif;
+    }
+    .td-icon-btn-small {
+      width: 28px; height: 28px;
+      border-radius: 14px;
+      background: rgba(37, 78, 92, 0.12);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0;
+    }
+    .td-tags-list {
+      display: flex; flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px 16px;
+    }
+    .td-tag-chip {
+      border: 1px solid rgba(26, 45, 51, 0.32);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 400;
+      color: #242424;
+      line-height: 20px;
+    }
+
+    /* ── Documents widget ───────────────────── */
+    .td-docs {
+      background: #fff;
+      border-radius: 20px;
+      padding: 8px 16px 16px;
+    }
+    .td-docs-headline {
+      display: flex; align-items: center;
+      padding: 6px 0;
+      min-height: 28px;
+    }
+    .td-docs-body {
+      display: flex; flex-direction: column; gap: 16px;
+      padding-top: 8px;
+    }
+    .td-docs-text {
+      font-size: 13px;
+      font-weight: 400;
+      color: #242424;
+      line-height: 20px;
+    }
+    .td-docs-link {
+      font-size: 13px;
+      font-weight: 400;
+      color: #4a74ff;
+      line-height: 20px;
+      margin-top: 8px;
+    }
+    .td-docs-buttons {
+      display: flex; gap: 12px;
+    }
+    .td-attach-btn {
+      flex: 1;
+      background: rgba(37, 78, 92, 0.12);
+      border-radius: 22px;
+      border: none; cursor: pointer;
+      padding: 12px 16px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+    .td-attach-btn:active { opacity: 0.7; }
+    .td-attach-label {
+      font-size: 15px;
+      font-weight: 500;
+      color: #242424;
+      line-height: 16px;
+      white-space: nowrap;
+    }
+    .td-camera-btn {
+      width: 44px;
+      background: rgba(37, 78, 92, 0.12);
+      border-radius: 22px;
+      border: none; cursor: pointer;
+      padding: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .td-camera-btn:active { opacity: 0.7; }
+
+    /* ── Details list ───────────────────────── */
+    .td-detail-item {
+      display: flex; flex-direction: column;
+      gap: 4px;
+      padding: 8px 16px;
+    }
+    .td-detail-label {
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(36, 47, 51, 0.64);
+      line-height: 20px;
+    }
+    .td-detail-value {
+      font-size: 15px;
+      font-weight: 400;
+      color: #242424;
+      line-height: 22px;
+    }
+
+    /* ── Cashback widget ────────────────────── */
+    .td-cashback-amount {
+      font-size: 17px;
+      font-weight: 400;
+      color: #242424;
+      line-height: 22px;
+      padding: 8px 16px 0;
+    }
+    .td-cashback-sub {
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(36, 47, 51, 0.64);
+      line-height: 20px;
+      padding: 4px 16px 8px;
+    }
+    .td-cashback-sub a {
+      color: #66f;
+      text-decoration: none;
+    }
+
+    /* ── Dispute row ────────────────────────── */
+    .td-dispute-row {
+      display: flex; align-items: center;
+      padding: 14px 16px;
+      gap: 16px;
+      cursor: pointer;
+    }
+    .td-dispute-row:active { background: rgba(37, 78, 92, 0.04); }
+    .td-dispute-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: rgba(37, 78, 92, 0.12);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .td-dispute-text {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 400;
+      color: #242424;
+      line-height: 22px;
+    }
+    .td-dispute-chevron {
+      width: 12px; height: 12px;
+      flex-shrink: 0;
+    }
+
+    /* ── AI floating button (tx details overlay) ── */
+    .td-ai-float {
+      position: fixed; right: calc(50% - 375px/2 + 20px); bottom: 32px;
+      z-index: 210;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(150deg, rgba(169,142,242,0.3) 12%, rgba(254,66,180,0.3) 78%);
+      border: 1px solid rgba(0,0,0,0.1); cursor: pointer;
+      box-shadow: 0 9px 16px rgba(0,0,0,0.09);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+    .td-ai-float img { width: 26px; height: 29px; }
+    .td-overlay.is-open .td-ai-float { opacity: 1; pointer-events: all; }
+    .td-ai-float:active { transform: scale(0.95); }
+
+    /* ── Home indicator ────────────────────── */
+    .td-home-indicator {
+      flex-shrink: 0;
+      display: flex; justify-content: center;
+      padding: 8px 0 6px;
+      background: #eef1f2;
+    }
+    .td-home-indicator-bar {
+      width: 144px; height: 5px;
+      background: #242424;
+      border-radius: 100px;
+    }
   </style>
 </head>
 <body>
@@ -809,6 +1174,175 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════
+       TRANSACTION DETAILS OVERLAY
+       ═══════════════════════════════════════════ -->
+  <div id="td-overlay" class="td-overlay" aria-hidden="true" role="dialog" aria-modal="true">
+
+    <!-- Backdrop — click to close -->
+    <div class="td-backdrop" id="td-backdrop"></div>
+
+    <!-- Peek card visible behind the sheet -->
+    <div class="td-peek-card"></div>
+
+    <!-- Sheet — main content -->
+    <div class="td-sheet" id="td-sheet" tabindex="-1">
+
+      <!-- Close button header -->
+      <div class="td-header">
+        <button class="td-close-btn" id="td-close-btn" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 4l8 8M12 4l-8 8" stroke="#242424" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Scrollable content area -->
+      <div class="td-scroll">
+        <div class="td-content">
+
+          <!-- Hero: status, recipient, amount -->
+          <div class="td-hero">
+            <div class="td-status-line">
+              <span class="td-status-text" id="td-status">Completed</span>
+              <span class="td-status-date" id="td-full-date">12 Jun 2021, 06:07</span>
+            </div>
+            <div class="td-recipient" id="td-recipient">Apple Store</div>
+            <div class="td-amount-big" id="td-amount-big">&minus; 550,00 &euro;</div>
+            <div class="td-fee">
+              <div class="td-fee-pill">
+                <span class="td-fee-text">No fee</span>
+              </div>
+            </div>
+            <div class="td-download-wrap">
+              <button class="td-download-btn" aria-label="Download proof">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 3v10M10 13l-3.5-3.5M10 13l3.5-3.5M3 15v1.5a.5.5 0 00.5.5h13a.5.5 0 00.5-.5V15" stroke="#242424" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <span class="td-download-label">Download</span>
+            </div>
+          </div>
+
+          <!-- Tags widget -->
+          <div class="td-widget">
+            <div class="td-widget-headline">
+              <span class="td-widget-title">Tags</span>
+              <button class="td-icon-btn-small" aria-label="Edit tags">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M11.3 2.3a1 1 0 011.4 0l1 1a1 1 0 010 1.4l-7 7L4 12.5l.8-2.7 6.5-7.5z" stroke="#242424" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+              </button>
+            </div>
+            <div class="td-tags-list" id="td-tags">
+              <span class="td-tag-chip">#office</span>
+              <span class="td-tag-chip">#projectx</span>
+            </div>
+          </div>
+
+          <!-- Documents widget -->
+          <div class="td-docs">
+            <div class="td-docs-headline">
+              <span class="td-widget-title">Documents</span>
+            </div>
+            <div class="td-docs-body">
+              <div>
+                <div class="td-docs-text">Attach an invoice, receipt, contract or any other documents to this transaction.</div>
+                <div class="td-docs-link">Document is not required</div>
+              </div>
+              <div class="td-docs-buttons">
+                <button class="td-attach-btn">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M14.5 10.5l-5.8 5.8a3 3 0 01-4.2-4.2l7.4-7.4a2 2 0 012.8 2.8l-7.4 7.4a1 1 0 01-1.4-1.4l5.8-5.8" stroke="#242424" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                  </svg>
+                  <span class="td-attach-label">Attach document</span>
+                </button>
+                <button class="td-camera-btn" aria-label="Camera">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M2.5 6.5a1.5 1.5 0 011.5-1.5h2l1-1.5h6l1 1.5h2a1.5 1.5 0 011.5 1.5v8a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 012.5 14.5v-8z" stroke="#242424" stroke-width="1.3" stroke-linejoin="round" fill="none"/>
+                    <circle cx="10" cy="10" r="3" stroke="#242424" stroke-width="1.3" fill="none"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Details widget -->
+          <div class="td-widget" id="td-details-widget">
+            <div class="td-widget-headline">
+              <span class="td-widget-title">Details</span>
+            </div>
+            <div id="td-details-list">
+              <div class="td-detail-item">
+                <span class="td-detail-label">Category</span>
+                <span class="td-detail-value" id="td-category">Entertainment (MCC 5933)</span>
+              </div>
+              <div class="td-detail-item">
+                <span class="td-detail-label">Made on</span>
+                <span class="td-detail-value" id="td-made-on">11 Jun 2021, 06:07</span>
+              </div>
+              <div class="td-detail-item">
+                <span class="td-detail-label">From</span>
+                <div>
+                  <div class="td-detail-value" id="td-from-account">Subscriptions</div>
+                  <div class="td-detail-value" id="td-from-card">&bull;&bull; 4520, Antonio La Mura</div>
+                </div>
+              </div>
+              <div class="td-detail-item">
+                <span class="td-detail-label">Location</span>
+                <span class="td-detail-value" id="td-location">Paris, France</span>
+              </div>
+              <div class="td-detail-item">
+                <span class="td-detail-label">Type</span>
+                <span class="td-detail-value" id="td-type">Card payment</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cashback widget -->
+          <div class="td-widget">
+            <div class="td-widget-headline">
+              <span class="td-widget-title">Cashback</span>
+              <button class="td-widget-action">View all</button>
+            </div>
+            <div class="td-cashback-amount">0,55 &euro;</div>
+            <div class="td-cashback-sub">Start plan 2%. <a href="#">Get more</a></div>
+          </div>
+
+          <!-- Dispute row -->
+          <div class="td-widget">
+            <div class="td-dispute-row">
+              <div class="td-dispute-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="5.5" stroke="#242424" stroke-width="1.2" fill="none"/>
+                  <path d="M6.5 6.5a1.5 1.5 0 013 0c0 1-1.5 1-1.5 2" stroke="#242424" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                  <circle cx="8" cy="10.5" r="0.5" fill="#242424"/>
+                </svg>
+              </div>
+              <span class="td-dispute-text">Dispute this transaction</span>
+              <svg class="td-dispute-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M4.5 2.5L8 6L4.5 9.5" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+        </div><!-- /td-content -->
+      </div><!-- /td-scroll -->
+
+      <!-- Home indicator bar -->
+      <div class="td-home-indicator">
+        <div class="td-home-indicator-bar"></div>
+      </div>
+
+    </div><!-- /td-sheet -->
+
+    <!-- AI floating button -->
+    <button class="td-ai-float" id="td-ai-float" aria-label="Open AI assistant">
+      <img src="https://www.figma.com/api/mcp/asset/6a6616f9-99bc-4d7c-b430-ea83c80bec83" alt="AI assistant">
+    </button>
+
+  </div><!-- /td-overlay -->
+
 </div><!-- /screen -->
 </div><!-- /device-frame -->
 
@@ -837,6 +1371,159 @@
   document.getElementById('ai-btn').addEventListener('click', function () {
     window.location.href = 'ai.html';
   });
+})();
+</script>
+
+<script>
+/* ───────────────────────────────────────────────
+   TRANSACTION DETAILS OVERLAY — open / close / data
+   ─────────────────────────────────────────────── */
+(function () {
+  var overlay  = document.getElementById('td-overlay');
+  var sheet    = document.getElementById('td-sheet');
+  var backdrop = document.getElementById('td-backdrop');
+  var closeBtn = document.getElementById('td-close-btn');
+  var screen   = document.querySelector('.screen');
+  var aiFloat  = document.getElementById('td-ai-float');
+
+  var lastFocused = null;
+  var FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+  /* ── Data extraction from tx-row ────────── */
+  function extractTxData(row) {
+    var nameEl   = row.querySelector('.tx-name');
+    var tagEl    = row.querySelector('.tx-tag');
+    var amountEl = row.querySelector('.tx-amount');
+    var dateEl   = row.querySelector('.tx-date');
+    var iconEl   = row.querySelector('.tx-icon');
+
+    /* Determine if outgoing or incoming */
+    var amountText = amountEl ? amountEl.textContent.trim() : '';
+    var isIncoming = amountEl && amountEl.classList.contains('tx-amount--positive');
+
+    /* Find the date group label (walk backward through siblings) */
+    var card = row.closest('.card');
+    var dateLabel = '';
+    if (card) {
+      var prev = card.previousElementSibling;
+      while (prev && !prev.classList.contains('date-label')) {
+        prev = prev.previousElementSibling;
+      }
+      if (prev) dateLabel = prev.textContent.trim();
+    }
+
+    return {
+      name:      nameEl ? nameEl.textContent.trim() : 'Unknown',
+      tag:       tagEl ? tagEl.textContent.trim() : '',
+      amount:    amountText,
+      shortDate: dateEl ? dateEl.textContent.trim() : '',
+      dateGroup: dateLabel,
+      isIncoming: isIncoming,
+      type:      isIncoming ? 'Bank transfer' : 'Card payment',
+      iconHTML:  iconEl ? iconEl.innerHTML : ''
+    };
+  }
+
+  /* ── Populate details UI ────────────────── */
+  function populateDetails(data) {
+    /* Hero section */
+    document.getElementById('td-status').textContent = 'Completed';
+    document.getElementById('td-full-date').textContent = data.shortDate ? data.dateGroup + ' · ' + data.shortDate : data.dateGroup;
+    document.getElementById('td-recipient').textContent = data.name;
+    document.getElementById('td-amount-big').textContent = data.amount;
+
+    /* Tags — use the tag from the row if present */
+    var tagsContainer = document.getElementById('td-tags');
+    if (data.tag) {
+      var cleanTag = data.tag.replace(/^[•·]\s*/, '');
+      tagsContainer.innerHTML = '<span class="td-tag-chip">' + cleanTag + '</span>';
+    } else {
+      tagsContainer.innerHTML = '<span class="td-tag-chip">#untagged</span>';
+    }
+
+    /* Details list */
+    document.getElementById('td-category').textContent = data.isIncoming ? 'Incoming transfer' : 'Entertainment (MCC 5933)';
+    document.getElementById('td-made-on').textContent = data.shortDate ? data.shortDate + ', 2024' : data.dateGroup;
+    document.getElementById('td-from-account').textContent = data.isIncoming ? data.name : 'Main account';
+    document.getElementById('td-from-card').textContent = data.isIncoming ? 'Incoming SEPA' : '·· 4520, Antonio La Mura';
+    document.getElementById('td-location').textContent = data.isIncoming ? '—' : 'Paris, France';
+    document.getElementById('td-type').textContent = data.type;
+  }
+
+  /* ── Open overlay ───────────────────────── */
+  function openTxDetails(txRow) {
+    var data = extractTxData(txRow);
+    populateDetails(data);
+
+    lastFocused = document.activeElement;
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+
+    /* Focus sheet — guard scroll position */
+    var pos = screen.scrollTop;
+    setTimeout(function () {
+      sheet.focus({ preventScroll: true });
+      screen.scrollTop = pos;
+    }, 50);
+  }
+
+  /* ── Close overlay ──────────────────────── */
+  function closeTxDetails() {
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+
+    /* Reset sheet scroll for next open */
+    var scrollArea = sheet.querySelector('.td-scroll');
+    if (scrollArea) scrollArea.scrollTop = 0;
+
+    if (lastFocused) {
+      var pos = screen.scrollTop;
+      lastFocused.focus({ preventScroll: true });
+      screen.scrollTop = pos;
+    }
+  }
+
+  /* ── Focus trap ─────────────────────────── */
+  function trapFocus(e) {
+    if (!overlay.classList.contains('is-open')) return;
+    var focusable = Array.prototype.slice.call(sheet.querySelectorAll(FOCUSABLE));
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last  = focusable[focusable.length - 1];
+    if (e.key === 'Tab') {
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+  }
+
+  /* ── Init listeners ─────────────────────── */
+  backdrop.addEventListener('click', function (e) { e.stopPropagation(); closeTxDetails(); });
+  closeBtn.addEventListener('click', function (e) { e.stopPropagation(); closeTxDetails(); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeTxDetails();
+    trapFocus(e);
+  });
+
+  /* Click handler on every tx-row */
+  document.querySelectorAll('.tx-row').forEach(function (row) {
+    row.setAttribute('role', 'button');
+    row.setAttribute('tabindex', '0');
+    row.addEventListener('click', function () { openTxDetails(row); });
+    row.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openTxDetails(row); }
+    });
+  });
+
+  /* AI floating button → navigate to AI page */
+  if (aiFloat) {
+    aiFloat.addEventListener('click', function () {
+      window.location.href = 'ai.html';
+    });
+  }
 })();
 </script>
 
