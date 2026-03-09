@@ -1592,8 +1592,9 @@
   }
 
   /* ── Open overlay ───────────────────────── */
-  var primeTriggered = sessionStorage.getItem('finom_prime_triggered');
-  var adsTriggered   = sessionStorage.getItem('finom_ads_triggered');
+  var primeTriggered     = sessionStorage.getItem('finom_prime_triggered');
+  var adsTriggered       = sessionStorage.getItem('finom_ads_triggered');
+  var boulangerTriggered = sessionStorage.getItem('finom_boulanger_triggered');
 
   function openTxDetails(txRow) {
     var data = extractTxData(txRow);
@@ -1697,6 +1698,55 @@
 
       /* Store unread chat ID so ai.html can show badge */
       sessionStorage.setItem('finom_ads_unread_chat_id', adsSession.id);
+
+      /* Show badge on AI float button after a brief delay */
+      setTimeout(function () {
+        if (aiFloat && !aiFloat.querySelector('.td-ai-float__badge')) {
+          var badge = document.createElement('span');
+          badge.className = 'td-ai-float__badge';
+          badge.textContent = '1';
+          aiFloat.appendChild(badge);
+        }
+      }, 600);
+    }
+
+    /* ── Cashback limit trigger: Boulanger S.A.S. tx ── */
+    if (!boulangerTriggered && data.name && data.name.indexOf('Boulanger') !== -1) {
+      boulangerTriggered = true;
+      sessionStorage.setItem('finom_boulanger_triggered', 'true');
+
+      /* Create proactive chat in history */
+      var boulangerSession = FinomAI.ChatHistory.create();
+      var boulangerMsg = {
+        id: 'msg_boulanger_' + Math.random().toString(36).substr(2, 9),
+        timestamp: Date.now(),
+        role: 'assistant',
+        content: 'You\u2019re almost reaching your cashback limit. Upgrading your card to Prime can unlock higher cashback limits and additional benefits.',
+        richContent: [
+          { type: 'text', value: 'You\u2019re almost reaching your cashback limit. Upgrading your card to Prime can unlock higher cashback limits and additional benefits.' },
+          { type: 'prime_buttons', buttons: [
+            { label: 'Upgrade to Prime', style: 'primary', action: 'upgrade_prime' },
+            { label: 'Learn more about Prime', style: 'secondary', action: 'learn_prime' }
+          ]}
+        ]
+      };
+      boulangerSession.messages = [boulangerMsg];
+      FinomAI.ChatHistory.updateMessages(boulangerSession.id, boulangerSession.messages);
+
+      /* Force-set title */
+      (function () {
+        try {
+          var KEY = 'finom_ai_chat_history';
+          var all = JSON.parse(localStorage.getItem(KEY)) || [];
+          for (var k = 0; k < all.length; k++) {
+            if (all[k].id === boulangerSession.id) { all[k].title = 'Cashback limit'; break; }
+          }
+          localStorage.setItem(KEY, JSON.stringify(all));
+        } catch (e) {}
+      })();
+
+      /* Store unread chat ID so ai.html can show badge */
+      sessionStorage.setItem('finom_boulanger_unread_chat_id', boulangerSession.id);
 
       /* Show badge on AI float button after a brief delay */
       setTimeout(function () {
