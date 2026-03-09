@@ -1014,6 +1014,21 @@
       <div class="tx-row">
         <div class="tx-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M7 17L17 7M17 7H10M17 7v7" stroke="#242424" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="tx-info">
+          <div class="tx-name">Meta Ads</div>
+          <div class="tx-tag">SEPA transfer</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount">&minus; 420,00 &euro;</div>
+          <div class="tx-date">19 Jul</div>
+        </div>
+      </div>
+      <div class="tx-row">
+        <div class="tx-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <rect x="2" y="5" width="20" height="14" rx="2.5" stroke="#242424" stroke-width="1.4" fill="none"/>
             <path d="M2 9.5h20" stroke="#242424" stroke-width="1.4"/>
             <rect x="5" y="13" width="5" height="2.5" rx="0.8" fill="#242424" opacity="0.6"/>
@@ -1434,7 +1449,7 @@
 
   /* Day-offsets per group; each sub-array = offsets for the tx-rows inside that card */
   var groupOffsets = [
-    [0, 0, 0, 0],   /* Today          */
+    [0, 0, 0, 0, 0], /* Today          */
     [-1, -1, -1],   /* Yesterday      */
     [-7, -11],       /* Earlier / prev */
     [-24, -31]       /* Older month    */
@@ -1564,10 +1579,21 @@
     document.getElementById('td-from-card').textContent = data.isIncoming ? 'Incoming SEPA' : '·· 4520, Antonio La Mura';
     document.getElementById('td-location').textContent = data.isIncoming ? '—' : 'Paris, France';
     document.getElementById('td-type').textContent = data.type;
+
+    /* Meta Ads SEPA transfer — override with correct details */
+    if (data.name === 'Meta Ads') {
+      tagsContainer.innerHTML = '<span class="td-tag-chip">#advertising</span>';
+      document.getElementById('td-category').textContent = 'Advertising';
+      document.getElementById('td-from-account').textContent = 'Main account';
+      document.getElementById('td-from-card').textContent = 'SEPA transfer';
+      document.getElementById('td-location').textContent = '—';
+      document.getElementById('td-type').textContent = 'SEPA transfer';
+    }
   }
 
   /* ── Open overlay ───────────────────────── */
   var primeTriggered = sessionStorage.getItem('finom_prime_triggered');
+  var adsTriggered   = sessionStorage.getItem('finom_ads_triggered');
 
   function openTxDetails(txRow) {
     var data = extractTxData(txRow);
@@ -1623,6 +1649,54 @@
 
       /* Store unread chat ID so ai.html can show badge */
       sessionStorage.setItem('finom_prime_unread_chat_id', primeSession.id);
+
+      /* Show badge on AI float button after a brief delay */
+      setTimeout(function () {
+        if (aiFloat && !aiFloat.querySelector('.td-ai-float__badge')) {
+          var badge = document.createElement('span');
+          badge.className = 'td-ai-float__badge';
+          badge.textContent = '1';
+          aiFloat.appendChild(badge);
+        }
+      }, 600);
+    }
+
+    /* ── Ad spend insight trigger: Meta Ads tx ── */
+    if (!adsTriggered && data.name && data.name.indexOf('Meta Ads') !== -1) {
+      adsTriggered = true;
+      sessionStorage.setItem('finom_ads_triggered', 'true');
+
+      /* Create proactive ads chat in history */
+      var adsSession = FinomAI.ChatHistory.create();
+      var adsMsg = {
+        id: 'msg_ads_' + Math.random().toString(36).substr(2, 9),
+        timestamp: Date.now(),
+        role: 'assistant',
+        content: 'Your advertising spend increased by 38% compared to the previous 30 days. Moving these payments to card could make them easier to manage and centralize.',
+        richContent: [
+          { type: 'text', value: 'Your advertising spend increased by 38% compared to the previous 30 days. Moving these payments to card could make them easier to manage and centralize.' },
+          { type: 'prime_buttons', buttons: [
+            { label: 'Review card-payment opportunities', style: 'primary', action: 'review_card_payments' }
+          ]}
+        ]
+      };
+      adsSession.messages = [adsMsg];
+      FinomAI.ChatHistory.updateMessages(adsSession.id, adsSession.messages);
+
+      /* Force-set title */
+      (function () {
+        try {
+          var KEY = 'finom_ai_chat_history';
+          var all = JSON.parse(localStorage.getItem(KEY)) || [];
+          for (var k = 0; k < all.length; k++) {
+            if (all[k].id === adsSession.id) { all[k].title = 'Ad spend insight'; break; }
+          }
+          localStorage.setItem(KEY, JSON.stringify(all));
+        } catch (e) {}
+      })();
+
+      /* Store unread chat ID so ai.html can show badge */
+      sessionStorage.setItem('finom_ads_unread_chat_id', adsSession.id);
 
       /* Show badge on AI float button after a brief delay */
       setTimeout(function () {

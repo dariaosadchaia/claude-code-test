@@ -42,6 +42,7 @@
 
   function clearUnreadState() {
     sessionStorage.removeItem('finom_prime_unread_chat_id');
+    sessionStorage.removeItem('finom_ads_unread_chat_id');
     hideHistoryBadge();
   }
 
@@ -161,7 +162,8 @@
       else older.push(s);
     });
 
-    var unreadChatId = sessionStorage.getItem('finom_prime_unread_chat_id');
+    var unreadChatId    = sessionStorage.getItem('finom_prime_unread_chat_id');
+    var unreadAdsChatId = sessionStorage.getItem('finom_ads_unread_chat_id');
 
     function renderGroup(items) {
       items.forEach(function (s) {
@@ -170,7 +172,7 @@
         item.setAttribute('data-chat-id', s.id);
 
         var isActive = s.id === activeChatId;
-        var isUnread = s.id === unreadChatId;
+        var isUnread = s.id === unreadChatId || s.id === unreadAdsChatId;
         var dateStr = FinomAI.ChatHistory.formatDate(s.createdAt);
 
         item.innerHTML =
@@ -360,6 +362,23 @@
       }, 900);
     }
 
+    if (action === 'review_card_payments') {
+      FinomAI.ChatEngine.addMessage({ role: 'user', content: 'Review card-payment opportunities' });
+      chatArea.appendChild(FinomAI.MessageRenderer.renderTypingIndicator());
+      scrollToBottom();
+      setTimeout(function () {
+        var typing = document.getElementById('typing-indicator');
+        if (typing) typing.remove();
+        FinomAI.ChatEngine.addMessage({
+          role: 'assistant',
+          content: 'Here are your recent SEPA transfers that could move to card.',
+          richContent: [
+            { type: 'text', value: 'Your top recurring SEPA payments — Meta Ads, Google Ads, and LinkedIn — totalled \u20ac1,240 last month. Moving these to a business card would consolidate spend tracking and unlock cashback on each transaction.' }
+          ]
+        });
+      }, 900);
+    }
+
     if (action === 'upgrade_prime') {
       // Add user message
       FinomAI.ChatEngine.addMessage({ role: 'user', content: 'Upgrade to Prime' });
@@ -407,12 +426,14 @@
 
   /* ── Initialize: create first chat session ─────────────────── */
   var unreadPrimeChatId = sessionStorage.getItem('finom_prime_unread_chat_id');
+  var unreadAdsChatId   = sessionStorage.getItem('finom_ads_unread_chat_id');
   var existingActiveId = FinomAI.ChatHistory.getActiveId();
   var existingSession = existingActiveId ? FinomAI.ChatHistory.getById(existingActiveId) : null;
 
-  /* If the active session IS the unread prime chat, don't auto-load it;
+  /* If the active session IS any unread proactive chat, don't auto-load it;
      start a fresh welcome screen instead so the user discovers it via history. */
-  var skipRestore = unreadPrimeChatId && existingActiveId === unreadPrimeChatId;
+  var skipRestore = (unreadPrimeChatId && existingActiveId === unreadPrimeChatId) ||
+                    (unreadAdsChatId   && existingActiveId === unreadAdsChatId);
 
   if (!skipRestore && existingSession && existingSession.messages && existingSession.messages.length > 0) {
     // Restore the active session
@@ -424,13 +445,17 @@
     activeChatId = session.id;
   }
 
-  /* ── Check for unread prime chat → show history badge ──────── */
+  /* ── Check for any unread proactive chat → show history badge ─ */
+  var hasUnread = false;
   if (unreadPrimeChatId) {
     var unreadSession = FinomAI.ChatHistory.getById(unreadPrimeChatId);
-    if (unreadSession && unreadSession.messages && unreadSession.messages.length > 0) {
-      showHistoryBadge('1');
-    }
+    if (unreadSession && unreadSession.messages && unreadSession.messages.length > 0) hasUnread = true;
   }
+  if (!hasUnread && unreadAdsChatId) {
+    var unreadAdsSession = FinomAI.ChatHistory.getById(unreadAdsChatId);
+    if (unreadAdsSession && unreadAdsSession.messages && unreadAdsSession.messages.length > 0) hasUnread = true;
+  }
+  if (hasUnread) showHistoryBadge('1');
 
   /* ── Update context for this screen (after reading previous) ─ */
   FinomAI.AppContext.update({ currentScreen: 'ai' });
