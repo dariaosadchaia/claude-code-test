@@ -426,12 +426,6 @@
     return div.innerHTML;
   }
 
-  /* ── Personalize welcome ───────────────────────────────────── */
-  var greetEl = document.getElementById('welcome-greeting');
-  if (greetEl && ctx.companyName) {
-    greetEl.textContent = 'Hi, ' + ctx.companyName + '!';
-  }
-
   /* ── Initialize: create first chat session ─────────────────── */
   var existingActiveId = FinomAI.ChatHistory.getActiveId();
   var existingSession  = existingActiveId ? FinomAI.ChatHistory.getById(existingActiveId) : null;
