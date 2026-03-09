@@ -363,20 +363,7 @@
     }
 
     if (action === 'review_card_payments') {
-      FinomAI.ChatEngine.addMessage({ role: 'user', content: 'Review card-payment opportunities' });
-      chatArea.appendChild(FinomAI.MessageRenderer.renderTypingIndicator());
-      scrollToBottom();
-      setTimeout(function () {
-        var typing = document.getElementById('typing-indicator');
-        if (typing) typing.remove();
-        FinomAI.ChatEngine.addMessage({
-          role: 'assistant',
-          content: 'Here are your recent SEPA transfers that could move to card.',
-          richContent: [
-            { type: 'text', value: 'Your top recurring SEPA payments — Meta Ads, Google Ads, and LinkedIn — totalled \u20ac1,240 last month. Moving these to a business card would consolidate spend tracking and unlock cashback on each transaction.' }
-          ]
-        });
-      }, 900);
+      window.open('https://finom.co/en-nl/cards/', '_blank');
     }
 
     if (action === 'upgrade_prime') {
