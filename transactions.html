@@ -1380,9 +1380,9 @@
 </div><!-- /screen -->
 </div><!-- /device-frame -->
 
+<script src="js/chat-history.js"></script>
 <script src="js/ai-icon.js"></script>
 <script src="js/app-context.js"></script>
-<script src="js/chat-history.js"></script>
 
 <script>
 /* ── Dynamic dates — all dates shift relative to today ───── */
@@ -1582,6 +1582,7 @@
         id: 'msg_prime_' + Math.random().toString(36).substr(2, 9),
         timestamp: Date.now(),
         role: 'assistant',
+        isRead: false,
         content: 'Based on your recent transaction at Larnaca Airport Business Lounge on your \u00b7\u00b7\u00b7\u00b7 4520 card, you may benefit from our Prime plan.',
         richContent: [
           { type: 'text', value: 'Based on your recent transaction at Larnaca Airport Business Lounge on your \u00b7\u00b7\u00b7\u00b7 4520 card, you may benefit from our Prime plan.' },
@@ -1625,6 +1626,7 @@
         id: 'msg_ads_' + Math.random().toString(36).substr(2, 9),
         timestamp: Date.now(),
         role: 'assistant',
+        isRead: false,
         content: 'Your advertising spend increased by 38% compared to the previous 30 days. Moving these payments to card could make them easier to manage and centralize.',
         richContent: [
           { type: 'text', value: 'Your advertising spend increased by 38% compared to the previous 30 days. Moving these payments to card could make them easier to manage and centralize.' },
@@ -1666,6 +1668,7 @@
         id: 'msg_boulanger_' + Math.random().toString(36).substr(2, 9),
         timestamp: Date.now(),
         role: 'assistant',
+        isRead: false,
         content: 'You\u2019re almost reaching your cashback limit. Upgrading your card to Prime can unlock higher cashback limits and additional benefits.',
         richContent: [
           { type: 'text', value: 'You\u2019re almost reaching your cashback limit. Upgrading your card to Prime can unlock higher cashback limits and additional benefits.' },

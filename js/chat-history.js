@@ -1,6 +1,15 @@
 /**
  * FinomAI ChatHistory — persists chat sessions to localStorage.
- * Each session: { id, title, createdAt, messages[] }
+ *
+ * Session shape:  { id, title, createdAt, messages[] }
+ * Message shape:  { id, timestamp, role, content, richContent?, isRead? }
+ *
+ * isRead semantics (assistant messages only):
+ *   isRead === false  → unread (proactive messages set this explicitly)
+ *   isRead === true   → read
+ *   isRead === undefined → treated as read (user-initiated live messages)
+ *
+ * Only messages with isRead === false contribute to the unread count.
  */
 window.FinomAI = window.FinomAI || {};
 
@@ -106,6 +115,74 @@ window.FinomAI.ChatHistory = (function () {
     return d.getDate() + ' ' + months[d.getMonth()];
   }
 
+  /* ── Unread message counting ─────────────────────────────── */
+
+  /**
+   * Count all unread assistant messages across every session.
+   * Only messages with isRead === false (set explicitly on proactive
+   * messages) are counted.  Live user-session messages are undefined
+   * for isRead and are therefore not counted.
+   */
+  function getUnreadCount() {
+    var sessions = load();
+    var count = 0;
+    for (var i = 0; i < sessions.length; i++) {
+      var msgs = sessions[i].messages || [];
+      for (var j = 0; j < msgs.length; j++) {
+        if (msgs[j].role === 'assistant' && msgs[j].isRead === false) {
+          count++;
+        }
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Return an array of session IDs that contain at least one unread
+   * assistant message (isRead === false).
+   */
+  function getUnreadSessionIds() {
+    var sessions = load();
+    var ids = [];
+    for (var i = 0; i < sessions.length; i++) {
+      var msgs = sessions[i].messages || [];
+      for (var j = 0; j < msgs.length; j++) {
+        if (msgs[j].role === 'assistant' && msgs[j].isRead === false) {
+          ids.push(sessions[i].id);
+          break;
+        }
+      }
+    }
+    return ids;
+  }
+
+  /**
+   * Mark all unread assistant messages in a session as read
+   * (sets isRead: true) and persists to localStorage.
+   * Returns true if any messages were changed.
+   */
+  function markMessagesRead(chatId) {
+    var sessions = load();
+    var changed = false;
+    for (var i = 0; i < sessions.length; i++) {
+      if (sessions[i].id === chatId) {
+        var msgs = sessions[i].messages || [];
+        for (var j = 0; j < msgs.length; j++) {
+          if (msgs[j].role === 'assistant' && msgs[j].isRead === false) {
+            msgs[j].isRead = true;
+            changed = true;
+          }
+        }
+        if (changed) {
+          sessions[i].messages = msgs;
+          save(sessions);
+        }
+        break;
+      }
+    }
+    return changed;
+  }
+
   return {
     getAll: getAll,
     getById: getById,
@@ -114,6 +191,9 @@ window.FinomAI.ChatHistory = (function () {
     remove: remove,
     getActiveId: getActiveId,
     setActiveId: setActiveId,
-    formatDate: formatDate
+    formatDate: formatDate,
+    getUnreadCount: getUnreadCount,
+    getUnreadSessionIds: getUnreadSessionIds,
+    markMessagesRead: markMessagesRead
   };
 })();

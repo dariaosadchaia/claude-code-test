@@ -3,40 +3,39 @@
  *
  * Unified AI icon component — single source of truth for badge state.
  *
+ * Badge count is derived from FinomAI.ChatHistory.getUnreadCount(), which
+ * counts assistant messages with isRead === false across all sessions.
+ * There is no separate badge store; the count always reflects real message state.
+ *
  * Usage
  * ─────
  *   Auto-init: add  data-ai-icon  attribute to any button element.
  *   Manual:    FinomAI.AIIcon.init(buttonEl)
- *   Refresh:   FinomAI.AIIcon.refresh()   ← call after writing unread keys
+ *   Refresh:   FinomAI.AIIcon.refresh()   ← call after any unread state change
  *
- * Badge state is derived from sessionStorage.  All registered instances
- * are synced together; there is no per-instance badge state.
+ * Requires js/chat-history.js to be loaded on the same page for real counts.
+ * If ChatHistory is unavailable, the badge silently shows nothing.
  */
 (function () {
   'use strict';
 
-  /* Keys that signal unread proactive messages */
-  var UNREAD_KEYS = [
-    'finom_prime_unread_chat_id',
-    'finom_ads_unread_chat_id',
-    'finom_boulanger_unread_chat_id'
-  ];
-
-  var BADGE_CLASS = 'ai-icon__badge';
+  var BADGE_CLASS  = 'ai-icon__badge';
+  var HISTORY_KEY  = 'finom_ai_chat_history';
 
   /* All registered AI icon button elements on the current page */
   var instances = [];
 
-  /* ── Badge count ─────────────────────────────────────── */
+  /* ── Badge count (delegated to ChatHistory) ─────────────── */
   function getUnreadCount() {
-    var count = 0;
-    for (var i = 0; i < UNREAD_KEYS.length; i++) {
-      if (sessionStorage.getItem(UNREAD_KEYS[i])) count++;
+    if (window.FinomAI &&
+        window.FinomAI.ChatHistory &&
+        typeof window.FinomAI.ChatHistory.getUnreadCount === 'function') {
+      return window.FinomAI.ChatHistory.getUnreadCount();
     }
-    return count;
+    return 0;
   }
 
-  /* ── Sync one element's badge to the given count ──────── */
+  /* ── Sync one element's badge to the given count ──────────── */
   function syncBadge(el, count) {
     var existing = el.querySelector('.' + BADGE_CLASS);
     if (count > 0) {
@@ -52,7 +51,7 @@
     }
   }
 
-  /* ── Refresh all registered instances ────────────────── */
+  /* ── Refresh all registered instances ────────────────────── */
   function refresh() {
     var count = getUnreadCount();
     for (var i = 0; i < instances.length; i++) {
@@ -60,7 +59,7 @@
     }
   }
 
-  /* ── Register a button element as an AI icon ──────────── */
+  /* ── Register a button element as an AI icon ──────────────── */
   function init(el) {
     if (!el) return;
     if (instances.indexOf(el) === -1) {
@@ -69,7 +68,7 @@
     refresh();
   }
 
-  /* ── Auto-discover data-ai-icon elements ─────────────── */
+  /* ── Auto-discover data-ai-icon elements ─────────────────── */
   function autoInit() {
     var els = document.querySelectorAll('[data-ai-icon]');
     for (var i = 0; i < els.length; i++) {
@@ -77,9 +76,10 @@
     }
   }
 
-  /* ── Cross-tab badge sync via storage event ──────────── */
+  /* ── Cross-tab badge sync via storage event ──────────────── */
+  /* Fires when another tab modifies localStorage (e.g. marks messages read). */
   window.addEventListener('storage', function (e) {
-    if (UNREAD_KEYS.indexOf(e.key) !== -1) refresh();
+    if (e.key === HISTORY_KEY) refresh();
   });
 
   /* Auto-init on DOM ready */

@@ -40,6 +40,15 @@
     if (b) b.remove();
   }
 
+  /* Refresh the history-button badge to match the real unread count. */
+  function syncHistoryBadge() {
+    var count = FinomAI.ChatHistory.getUnreadCount();
+    if (count > 0) showHistoryBadge(count);
+    else hideHistoryBadge();
+  }
+
+  /* Keep sessionStorage keys for legacy reference; badge is now driven
+     from ChatHistory.getUnreadCount() via markMessagesRead(). */
   function clearUnreadState() {
     sessionStorage.removeItem('finom_prime_unread_chat_id');
     sessionStorage.removeItem('finom_ads_unread_chat_id');
@@ -98,6 +107,12 @@
     var typing = document.getElementById('typing-indicator');
     if (typing) typing.remove();
 
+    /* Mark unread messages as read BEFORE loading into the engine.
+       This ensures the engine's in-memory copy already has isRead: true,
+       so subsequent updateMessages() calls never revert them to unread. */
+    FinomAI.ChatHistory.markMessagesRead(chatId);
+
+    /* Re-fetch after marking so we get the updated isRead: true values. */
     var session = FinomAI.ChatHistory.getById(chatId);
     if (!session) return;
 
@@ -124,6 +139,10 @@
 
     composer.value = '';
     updateSendState();
+
+    /* Sync badge and history button to updated unread count. */
+    if (window.FinomAI.AIIcon) FinomAI.AIIcon.refresh();
+    syncHistoryBadge();
   }
 
   /* ── New chat (pencil icon on main chat) ─────────────────── */
@@ -163,9 +182,8 @@
       else older.push(s);
     });
 
-    var unreadChatId         = sessionStorage.getItem('finom_prime_unread_chat_id');
-    var unreadAdsChatId      = sessionStorage.getItem('finom_ads_unread_chat_id');
-    var unreadBoulangerChatId = sessionStorage.getItem('finom_boulanger_unread_chat_id');
+    /* Compute unread session IDs from real message state (isRead === false). */
+    var unreadSessionIds = FinomAI.ChatHistory.getUnreadSessionIds();
 
     function renderGroup(items) {
       items.forEach(function (s) {
@@ -174,7 +192,7 @@
         item.setAttribute('data-chat-id', s.id);
 
         var isActive = s.id === activeChatId;
-        var isUnread = s.id === unreadChatId || s.id === unreadAdsChatId || s.id === unreadBoulangerChatId;
+        var isUnread = unreadSessionIds.indexOf(s.id) !== -1;
         var dateStr = FinomAI.ChatHistory.formatDate(s.createdAt);
 
         item.innerHTML =
@@ -233,7 +251,8 @@
     saveCurrentChat();
     renderHistoryList();
     historyOverlay.classList.add('is-visible');
-    clearUnreadState();
+    /* Do NOT clear unread state here — messages are only marked read
+       when the user actually opens a specific chat via loadChat(). */
   }
 
   function hideHistory() {
@@ -414,38 +433,27 @@
   }
 
   /* ── Initialize: create first chat session ─────────────────── */
-  var unreadPrimeChatId     = sessionStorage.getItem('finom_prime_unread_chat_id');
-  var unreadAdsChatId       = sessionStorage.getItem('finom_ads_unread_chat_id');
-  var unreadBoulangerChatId = sessionStorage.getItem('finom_boulanger_unread_chat_id');
   var existingActiveId = FinomAI.ChatHistory.getActiveId();
-  var existingSession = existingActiveId ? FinomAI.ChatHistory.getById(existingActiveId) : null;
+  var existingSession  = existingActiveId ? FinomAI.ChatHistory.getById(existingActiveId) : null;
 
-  /* If the active session IS any unread proactive chat, don't auto-load it;
-     start a fresh welcome screen instead so the user discovers it via history. */
-  var skipRestore = (unreadPrimeChatId     && existingActiveId === unreadPrimeChatId) ||
-                    (unreadAdsChatId       && existingActiveId === unreadAdsChatId) ||
-                    (unreadBoulangerChatId && existingActiveId === unreadBoulangerChatId);
+  /* If the active session itself has unread proactive messages, show the
+     welcome screen instead of auto-loading it.  The user discovers it via
+     history so it registers as genuinely "read" when they open it there. */
+  var unreadIds    = FinomAI.ChatHistory.getUnreadSessionIds();
+  var skipRestore  = existingActiveId && unreadIds.indexOf(existingActiveId) !== -1;
 
   if (!skipRestore && existingSession && existingSession.messages && existingSession.messages.length > 0) {
-    // Restore the active session
+    /* Restore the active session — loadChat marks it read if needed */
     activeChatId = existingSession.id;
     loadChat(activeChatId);
   } else {
-    // Start fresh
+    /* Start fresh */
     var session = FinomAI.ChatHistory.create();
     activeChatId = session.id;
   }
 
-  /* ── Check for any unread proactive chat → show history badge ─ */
-  var hasUnread = false;
-  var proactiveIds = [unreadPrimeChatId, unreadAdsChatId, unreadBoulangerChatId];
-  for (var pi = 0; pi < proactiveIds.length; pi++) {
-    if (proactiveIds[pi]) {
-      var ps = FinomAI.ChatHistory.getById(proactiveIds[pi]);
-      if (ps && ps.messages && ps.messages.length > 0) { hasUnread = true; break; }
-    }
-  }
-  if (hasUnread) showHistoryBadge('1');
+  /* ── Show history-button badge with real unread count ─────── */
+  syncHistoryBadge();
 
   /* ── Update context for this screen (after reading previous) ─ */
   FinomAI.AppContext.update({ currentScreen: 'ai' });
