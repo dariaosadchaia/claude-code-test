@@ -738,6 +738,18 @@
     }
 
     .co-benefit-icon--prime { background: rgba(254,66,180,0.1) !important; }
+
+    /* ── Virtual card overlay variant ───────────── */
+    .co-card--virtual {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2c2c54 100%) !important;
+      border-color: rgba(255,255,255,0.1) !important;
+    }
+    .co-card--virtual::before { background: none !important; }
+    .co-card--virtual::after  { background: none !important; }
+    .co-card--virtual .co-card__brand  { color: rgba(255,255,255,0.9); }
+    .co-card--virtual .co-card__label  { color: rgba(255,255,255,0.7); }
+    .co-card--virtual .co-card__number { color: rgba(255,255,255,0.7); }
+    .co-card--virtual .co-card__visa   { color: rgba(255,255,255,0.8); }
   </style>
 </head>
 <body>
@@ -864,13 +876,13 @@
       </div>
 
       <!-- Physical -->
-      <div class="card-row">
+      <div class="card-row" data-card="physical">
         <div class="card-thumb physical">
           <span class="card-visa">VISA</span>
         </div>
         <div class="card-info">
           <div class="card-name">Physical</div>
-          <div class="card-sub">~3255, 200 € / 1 000 €</div>
+          <div class="card-sub">···· 2290 &nbsp;· 342 € / 5 000 €</div>
         </div>
         <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -878,7 +890,7 @@
       </div>
 
       <!-- Virtual -->
-      <div class="card-row">
+      <div class="card-row" data-card="virtual">
         <div class="card-thumb virtual">
           <span class="card-visa">VISA</span>
           <svg class="cloud-badge" viewBox="0 0 12 9" fill="none">
@@ -887,7 +899,7 @@
         </div>
         <div class="card-info">
           <div class="card-name">Virtual</div>
-          <div class="card-sub">~3255, 200 € / 1 000 €</div>
+          <div class="card-sub">···· 7731 &nbsp;· 89 € / 1 000 €</div>
         </div>
         <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1319,8 +1331,8 @@
   var cards = [];
   document.querySelectorAll('.card-row').forEach(function (row) {
     var name = (row.querySelector('.card-name') || {}).textContent || '';
-    var sub = (row.querySelector('.card-sub') || {}).textContent || '';
-    var match = sub.match(/~(\d+)/);
+    var sub  = (row.querySelector('.card-sub') || {}).textContent || '';
+    var match = sub.match(/(\d{4})/);
     cards.push({ type: name, lastFour: match ? match[1] : '', detail: sub });
   });
   if (cards.length) ctx.cards = cards;
@@ -1349,7 +1361,7 @@
 
 <script>
 /* ───────────────────────────────────────────────
-   CARDS OVERLAY — open / close / accessibility
+   CARDS OVERLAY — open / close / per-card data
    ─────────────────────────────────────────────── */
 (function () {
   var overlay  = document.getElementById('cards-overlay');
@@ -1357,92 +1369,167 @@
   var backdrop = document.getElementById('co-backdrop');
   var closeBtn = document.getElementById('co-close-btn');
   var screen   = document.querySelector('.screen');
-
-  /* Focusable elements inside the sheet */
   var FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
   var lastFocused = null;
 
-  /* ── Prime state upgrade (run once) ──────────── */
-  var primeApplied = false;
-  function applyPrimeState() {
-    if (primeApplied) return;
-    primeApplied = true;
-    overlay.classList.add('co-prime');
+  var CHEVRON = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-    /* 1. Card visual → dark Prime */
-    var card = overlay.querySelector('.co-card');
-    if (card) card.classList.add('co-card--prime');
+  /* ── Per-card mock data ──────────────────────── */
+  var CARD_DATA = {
+    physical: {
+      number:        '\u00b7\u00b7\u00b7\u00b7 2290\u00a0\u00a012/27',
+      lastFour:      '2290',
+      label:         'Physical',
+      isVirtual:     false,
+      cardholder:    'ANTONIO LA MURA',
+      linkedBalance: '5\u202f000,00 \u20ac',
+      limits: [
+        { label: 'Payment limit',    value: '342 \u20ac',        total: '5\u202f000 \u20ac', pct: 6.84 },
+        { label: 'Withdrawal limit', value: '8\u202f000 \u20ac', total: '5\u202f000 \u20ac', pct: 100  }
+      ],
+      isPrimeable: true
+    },
+    virtual: {
+      number:        '\u00b7\u00b7\u00b7\u00b7 7731\u00a0\u00a009/26',
+      lastFour:      '7731',
+      label:         'Virtual',
+      isVirtual:     true,
+      cardholder:    'ROSAMOND ANDERSON',
+      linkedBalance: '1\u202f000,00 \u20ac',
+      limits: [
+        { label: 'Payment limit',    value: '89 \u20ac', total: '1\u202f000 \u20ac', pct: 8.9 },
+        { label: 'Withdrawal limit', value: '0 \u20ac',  total: '500 \u20ac',        pct: 0   }
+      ],
+      isPrimeable: false
+    }
+  };
 
-    /* 2. PRIME badge */
+  /* Sync dashboard card-sub from the same CARD_DATA so both share one source */
+  document.querySelectorAll('.card-row[data-card]').forEach(function (row) {
+    var d = CARD_DATA[row.dataset.card];
+    if (!d) return;
+    var subEl = row.querySelector('.card-sub');
+    if (subEl) subEl.textContent = '\u00b7\u00b7\u00b7\u00b7 ' + d.lastFour + '\u00a0\u00b7 ' + d.limits[0].value + ' / ' + d.limits[0].total;
+  });
+
+  /* ── Populate overlay for a given card ──────── */
+  function populateOverlay(cardType) {
+    var data    = CARD_DATA[cardType] || CARD_DATA.physical;
+    var isPrime = (cardType === 'physical' && sessionStorage.getItem('finom_prime_upgraded') === 'true');
+
+    /* Card visual */
+    var cardEl   = overlay.querySelector('.co-card');
+    var numEl    = overlay.querySelector('.co-card__number');
+    var labelEl  = overlay.querySelector('.co-card__label');
     var labelRow = overlay.querySelector('.co-card__label-row');
-    if (labelRow) {
-      var badge = document.createElement('span');
-      badge.className = 'co-card__prime-badge';
-      badge.textContent = 'PRIME';
-      labelRow.appendChild(badge);
+    if (numEl)   numEl.textContent   = data.number;
+    if (labelEl) labelEl.textContent = data.label;
+
+    if (cardEl) {
+      cardEl.classList.remove('co-card--prime', 'co-card--virtual');
+      if (data.isVirtual) cardEl.classList.add('co-card--virtual');
+    }
+    overlay.classList.remove('co-prime');
+
+    /* Remove any leftover Prime badge */
+    var existingBadge = labelRow ? labelRow.querySelector('.co-card__prime-badge') : null;
+    if (existingBadge) existingBadge.remove();
+
+    /* Apply Prime styling when upgraded */
+    if (isPrime) {
+      overlay.classList.add('co-prime');
+      if (cardEl) cardEl.classList.add('co-card--prime');
+      if (labelRow) {
+        var badge = document.createElement('span');
+        badge.className = 'co-card__prime-badge';
+        badge.textContent = 'PRIME';
+        labelRow.appendChild(badge);
+      }
     }
 
-    /* 3. Cardholder name */
-    var cardholderRow = overlay.querySelectorAll('.co-row-sub');
-    if (cardholderRow[0]) cardholderRow[0].textContent = 'ANTONIO LA MURA';
+    /* Cardholder & linked account */
+    var rowSubs = overlay.querySelectorAll('.co-row-sub');
+    if (rowSubs[0]) rowSubs[0].textContent = data.cardholder;
+    if (rowSubs[1]) rowSubs[1].textContent = data.linkedBalance;
 
-    /* 4. Replace benefits — remove promo, add Prime rows */
-    var benefitsSection = overlay.querySelector('.co-benefits-headline');
-    if (benefitsSection) {
-      var section = benefitsSection.parentElement;
-      benefitsSection.querySelector('.co-benefits-title').textContent = 'Prime benefits';
+    /* Limits — rebuild from scratch */
+    var limSection = overlay.querySelector('#co-limits-title').closest('.co-section');
+    limSection.querySelectorAll('.co-limit-item').forEach(function (el) { el.remove(); });
+    var limits = data.limits;
+    limits.forEach(function (lim) {
+      var item = document.createElement('div');
+      item.className = 'co-limit-item';
+      item.innerHTML =
+        '<span class="co-limit-label">' + lim.label + '</span>' +
+        '<div class="co-limit-value">' + lim.value + ' <span class="co-limit-total">/ ' + lim.total + '</span></div>' +
+        '<div class="co-progress"><div class="co-progress__fill" style="width:' + lim.pct + '%"></div></div>';
+      limSection.appendChild(item);
+    });
 
-      /* Remove existing rows & promo */
-      var rows = section.querySelectorAll('.co-row, .co-promo-section');
-      rows.forEach(function (r) { r.remove(); });
+    /* Benefits — rebuild from scratch */
+    var benefitsHeadline = overlay.querySelector('.co-benefits-headline');
+    if (benefitsHeadline) {
+      var section = benefitsHeadline.parentElement;
+      var titleEl = benefitsHeadline.querySelector('.co-benefits-title');
+      section.querySelectorAll('.co-row, .co-promo-section').forEach(function (el) { el.remove(); });
 
-      var chevronSvg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 3L7.5 6L4.5 9" stroke="rgba(36,47,51,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      if (isPrime) {
+        titleEl.textContent = 'Prime benefits';
+        [
+          { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5l1.8 3.7L14 5.8l-3 2.8.7 4.1L8 10.9l-3.7 1.8.7-4.1-3-2.8 4.2-.6L8 1.5z" stroke="#fe42b4" stroke-width="1.1" stroke-linejoin="round" fill="none"/></svg>', text: '1% cashback on all card payments' },
+          { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#fe42b4" stroke-width="1.1" fill="none"/><path d="M4.5 8h7M8 4.5v7" stroke="#fe42b4" stroke-width="1.1" stroke-linecap="round"/></svg>', text: 'Zero FX fees up to \u20ac20,000\u00a0/\u00a0mo' },
+          { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 11c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="#fe42b4" stroke-width="1.1" stroke-linecap="round" fill="none"/><circle cx="8" cy="11.5" r="1" fill="#fe42b4"/><path d="M5 4l1.5 1.5M11 4l-1.5 1.5" stroke="#fe42b4" stroke-width="1.1" stroke-linecap="round"/></svg>', text: '2 lounge visits per quarter' },
+          { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="4" y="2" width="8" height="12" rx="1.5" stroke="#fe42b4" stroke-width="1.1" fill="none"/><path d="M6.5 11h3" stroke="#fe42b4" stroke-width="1.1" stroke-linecap="round"/></svg>', text: 'Monthly eSIM data (1\u00a0GB)' }
+        ].forEach(function (b) {
+          var row = document.createElement('div');
+          row.className = 'co-row';
+          row.innerHTML = '<div class="co-icon-block co-benefit-icon--prime">' + b.icon + '</div><span class="co-row-title">' + b.text + '</span>' + CHEVRON;
+          section.appendChild(row);
+        });
 
-      var benefits = [
-        { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5l1.8 3.7L14 5.8l-3 2.8.7 4.1L8 10.9l-3.7 1.8.7-4.1-3-2.8 4.2-.6L8 1.5z" stroke="#fe42b4" stroke-width="1.1" stroke-linejoin="round" fill="none"/></svg>', text: '1% cashback on all card payments' },
-        { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#fe42b4" stroke-width="1.1" fill="none"/><path d="M4.5 8h7M8 4.5v7" stroke="#fe42b4" stroke-width="1.1" stroke-linecap="round"/></svg>', text: 'Zero FX fees up to \u20ac20,000 / mo' },
-        { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 11c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="#fe42b4" stroke-width="1.1" stroke-linecap="round" fill="none"/><circle cx="8" cy="11.5" r="1" fill="#fe42b4"/><path d="M5 4l1.5 1.5M11 4l-1.5 1.5" stroke="#fe42b4" stroke-width="1.1" stroke-linecap="round"/></svg>', text: '2 lounge visits per quarter' },
-        { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="4" y="2" width="8" height="12" rx="1.5" stroke="#fe42b4" stroke-width="1.1" fill="none"/><path d="M6.5 11h3" stroke="#fe42b4" stroke-width="1.1" stroke-linecap="round"/></svg>', text: 'Monthly eSIM data (1 GB)' }
-      ];
+      } else if (data.isPrimeable) {
+        /* Physical, not yet Prime — standard benefits + upgrade promo */
+        titleEl.textContent = 'Card benefits';
+        [
+          { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#242424" stroke-width="1.1" fill="none"/><path d="M5.5 10.5l5-5" stroke="#242424" stroke-width="1.1" stroke-linecap="round"/><circle cx="6" cy="6" r="1" fill="#242424"/><circle cx="10" cy="10" r="1" fill="#242424"/></svg>', text: 'Cashback' },
+          { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5l1.6 4.6 4.9.4-3.7 3.2 1.2 4.8L8 12.2l-4 2.3 1.2-4.8-3.7-3.2 4.9-.4L8 1.5z" stroke="#242424" stroke-width="1.1" stroke-linejoin="round" fill="none"/></svg>', text: 'Special offers' }
+        ].forEach(function (b) {
+          var row = document.createElement('div');
+          row.className = 'co-row';
+          row.innerHTML = '<div class="co-icon-block">' + b.icon + '</div><span class="co-row-title">' + b.text + '</span>' + CHEVRON;
+          section.appendChild(row);
+        });
+        var promo = document.createElement('div');
+        promo.className = 'co-promo-section';
+        promo.innerHTML =
+          '<div class="co-row"><div class="co-icon-block"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="7.5" width="11" height="7" rx="1.5" stroke="#242424" stroke-width="1.1" fill="none"/><path d="M5.5 7.5V5a2.5 2.5 0 015 0v2.5" stroke="#242424" stroke-width="1.1" stroke-linecap="round"/><circle cx="8" cy="11" r="1" fill="#242424"/></svg></div><div class="co-row-text"><span class="co-row-title">Higher limits</span><span class="co-row-sub">Get up to \u20ac1K cashback and no FX fees</span></div>' + CHEVRON + '</div>' +
+          '<div class="co-row"><div class="co-icon-block"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#242424" stroke-width="1.1" fill="none"/><path d="M1.5 8h13M8 1.5C6 1.5 4.5 4.5 4.5 8S6 14.5 8 14.5 11.5 11.5 11.5 8 10 1.5 8 1.5z" stroke="#242424" stroke-width="1.1" fill="none"/></svg></div><div class="co-row-text"><span class="co-row-title">Travel perks</span><span class="co-row-sub">Free business lounges, eSIMs and Fast Track</span></div>' + CHEVRON + '</div>' +
+          '<div class="co-cta-wrap"><button class="co-cta-btn">Explore Prime benefits</button></div>';
+        section.appendChild(promo);
 
-      benefits.forEach(function (b) {
-        var row = document.createElement('div');
-        row.className = 'co-row';
-        row.innerHTML =
-          '<div class="co-icon-block co-benefit-icon--prime">' + b.icon + '</div>' +
-          '<span class="co-row-title">' + b.text + '</span>' +
-          chevronSvg;
-        section.appendChild(row);
-      });
-    }
-
-    /* 5. Add third limit (Contactless/Apple Pay) */
-    var limitsSection = overlay.querySelector('#co-limits-title');
-    if (limitsSection) {
-      var limSection = limitsSection.closest('.co-section');
-      var existingLimits = limSection.querySelectorAll('.co-limit-item');
-      if (existingLimits.length === 2) {
-        var newLimit = document.createElement('div');
-        newLimit.className = 'co-limit-item';
-        newLimit.innerHTML =
-          '<span class="co-limit-label">Contactless / Apple\u00a0Pay</span>' +
-          '<div class="co-limit-value">1 450 \u20ac <span class="co-limit-total">/ 10 000 \u20ac</span></div>' +
-          '<div class="co-progress"><div class="co-progress__fill" style="width:14.5%"></div></div>';
-        limSection.appendChild(newLimit);
+      } else {
+        /* Virtual card — standard benefits, no Prime promo */
+        titleEl.textContent = 'Card benefits';
+        [
+          { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#242424" stroke-width="1.1" fill="none"/><path d="M5.5 10.5l5-5" stroke="#242424" stroke-width="1.1" stroke-linecap="round"/><circle cx="6" cy="6" r="1" fill="#242424"/><circle cx="10" cy="10" r="1" fill="#242424"/></svg>', text: 'Cashback' },
+          { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5l1.6 4.6 4.9.4-3.7 3.2 1.2 4.8L8 12.2l-4 2.3 1.2-4.8-3.7-3.2 4.9-.4L8 1.5z" stroke="#242424" stroke-width="1.1" stroke-linejoin="round" fill="none"/></svg>', text: 'Special offers' },
+          { icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#242424" stroke-width="1.1" fill="none"/><path d="M1.5 8h13M8 1.5C6 1.5 4.5 4.5 4.5 8S6 14.5 8 14.5 11.5 11.5 11.5 8 10 1.5 8 1.5z" stroke="#242424" stroke-width="1.1" fill="none"/></svg>', text: 'Online payments' }
+        ].forEach(function (b) {
+          var row = document.createElement('div');
+          row.className = 'co-row';
+          row.innerHTML = '<div class="co-icon-block">' + b.icon + '</div><span class="co-row-title">' + b.text + '</span>' + CHEVRON;
+          section.appendChild(row);
+        });
       }
     }
   }
 
-  function openCardsOverlay() {
-    /* Apply Prime state if upgraded */
-    if (sessionStorage.getItem('finom_prime_upgraded') === 'true') {
-      applyPrimeState();
-    }
+  /* ── Open / Close ────────────────────────────── */
+  function openCardsOverlay(cardType) {
+    populateOverlay(cardType || 'physical');
     lastFocused = document.activeElement;
     overlay.classList.add('is-open');
     overlay.setAttribute('aria-hidden', 'false');
-    /* Focus the sheet for screen readers — guard scroll position.
-       Never touch .screen overflow or body overflow. */
     var pos = screen.scrollTop;
     setTimeout(function () {
       sheet.focus({ preventScroll: true });
@@ -1460,64 +1547,41 @@
     }
   }
 
-  /* Focus trap */
+  /* ── Focus trap ──────────────────────────────── */
   function trapFocus(e) {
     if (!overlay.classList.contains('is-open')) return;
     var focusable = Array.prototype.slice.call(sheet.querySelectorAll(FOCUSABLE));
     if (!focusable.length) return;
-    var first = focusable[0];
-    var last  = focusable[focusable.length - 1];
+    var first = focusable[0], last = focusable[focusable.length - 1];
     if (e.key === 'Tab') {
-      if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-      } else {
-        if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
-      }
+      if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
+      else            { if (document.activeElement === last)  { e.preventDefault(); first.focus(); } }
     }
   }
+
+  /* ── Wire listeners ──────────────────────────── */
+  backdrop.addEventListener('click', closeCardsOverlay);
+  closeBtn.addEventListener('click', closeCardsOverlay);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeCardsOverlay();
+    trapFocus(e);
+  });
+
+  /* Each card-row carries data-card="physical"|"virtual" */
+  document.querySelectorAll('.card-row').forEach(function (row) {
+    var cardType = row.dataset.card || 'physical';
+    row.setAttribute('role', 'button');
+    row.setAttribute('tabindex', '0');
+    row.addEventListener('click', function () { openCardsOverlay(cardType); });
+    row.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCardsOverlay(cardType); }
+    });
+  });
 
   var aiFloat = document.getElementById('co-ai-float');
   var aiChip  = document.querySelector('.co-ai-chip');
-
-  function initCardsOverlay() {
-    /* Close on backdrop click */
-    backdrop.addEventListener('click', closeCardsOverlay);
-
-    /* Close button */
-    closeBtn.addEventListener('click', closeCardsOverlay);
-
-    /* Close on Escape */
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeCardsOverlay();
-      trapFocus(e);
-    });
-
-    /* Open when tapping a card row in the Cards widget */
-    document.querySelectorAll('.card-row').forEach(function (row) {
-      row.setAttribute('role', 'button');
-      row.setAttribute('tabindex', '0');
-      row.addEventListener('click', openCardsOverlay);
-      row.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCardsOverlay(); }
-      });
-    });
-
-    /* AI floating button → navigate to AI page */
-    if (aiFloat) {
-      aiFloat.addEventListener('click', function () {
-        window.location.href = 'ai.html';
-      });
-    }
-
-    /* AI chip in Limits section → navigate to AI page */
-    if (aiChip) {
-      aiChip.addEventListener('click', function () {
-        window.location.href = 'ai.html';
-      });
-    }
-  }
-
-  initCardsOverlay();
+  if (aiFloat) aiFloat.addEventListener('click', function () { window.location.href = 'ai.html'; });
+  if (aiChip)  aiChip.addEventListener('click',  function () { window.location.href = 'ai.html'; });
 })();
 </script>
 
