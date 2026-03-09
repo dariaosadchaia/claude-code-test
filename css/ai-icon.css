@@ -1,0 +1,93 @@
+/* ══════════════════════════════════════════════════════════════
+   AI Icon — unified component styles
+   All AI icon button variants (tab-bar, overlay float, ghost)
+   share this stylesheet.  Page-specific positioning (fixed,
+   bottom, right, z-index, opacity, transition) lives in each
+   page's embedded <style> block so this file stays generic.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Base: shared by every variant ───────────────────────── */
+[data-ai-icon] {
+  position: relative;
+  overflow: visible;
+  background: none;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The Button.svg is 84×84 with its own gradient circle + shadow.
+   The visible circle is 52 px wide, centred inside the 84 px canvas.
+   Displaying at 84×84 and centring it over the 52×52 hit-area means
+   the circle aligns exactly while the shadow overflows naturally. */
+[data-ai-icon] > img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 84px;
+  height: 84px;
+  pointer-events: none;
+}
+
+/* ── Badge ────────────────────────────────────────────────── */
+.ai-icon__badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: #fe42b4;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Tab-bar variant (.ai-btn) ────────────────────────────── */
+.ai-btn {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  transform: translateY(10px);
+  view-transition-name: ai-btn;
+}
+
+/* ── Ghost placeholder used in ai.html for view-transition ── */
+/* Matches the tab-bar transform so the shared-element animation
+   starts/ends at the same visual position as .ai-btn. */
+.ai-btn-ghost {
+  position: fixed;
+  bottom: 32px;
+  right: 20px;
+  width: 52px;
+  height: 52px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(10px);
+  view-transition-name: ai-btn;
+}
+
+/* ── Overlay floating variant (.ai-float) ─────────────────── */
+/* Positional rules (fixed, right, bottom, z-index) are kept
+   per-page.  Only the shared visual rules live here. */
+.ai-float {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+.ai-float:active { transform: scale(0.95); }

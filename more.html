@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0">
   <title>Finom – More</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/ai-icon.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     @view-transition { navigation: auto; }
@@ -350,21 +351,7 @@
       line-height: 10px;
     }
     .tab.active .tab-label { color: #fff; }
-    .ai-btn {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: linear-gradient(150deg, rgba(169,142,242,0.3) 12%, rgba(254,66,180,0.3) 78%);
-      border: 1px solid rgba(0,0,0,0.1);
-      box-shadow: 0 9px 16px rgba(0,0,0,0.09);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      view-transition-name: ai-btn;
-    }
-    .ai-btn img { width: 26px; height: 29px; }
+    /* .ai-btn styles live in css/ai-icon.css */
   </style>
 </head>
 <body>
@@ -891,8 +878,8 @@
       </div>
 
       <!-- AI button -->
-      <button class="ai-btn" id="ai-btn" aria-label="Open AI assistant">
-        <img src="https://www.figma.com/api/mcp/asset/6a6616f9-99bc-4d7c-b430-ea83c80bec83" alt="AI assistant">
+      <button class="ai-btn" id="ai-btn" data-ai-icon aria-label="Open AI assistant">
+        <img src="Button.svg" alt="">
       </button>
     </div>
   </div>
@@ -900,6 +887,7 @@
 </div><!-- /screen -->
 </div><!-- /device-frame -->
 
+<script src="js/ai-icon.js"></script>
 <script src="js/app-context.js"></script>
 <script>
 (function () {
